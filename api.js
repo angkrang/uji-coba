@@ -4,7 +4,7 @@
  
  */
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwtCyKx9SRDNkeCEW1W63Rthe8wFUKVqlnmCBoowAqLP4684hj3VmKK3JSk76_CvMGR/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz82ZaQSINGpNhpzICf4JS5d5ijhehE5nLfFUWb5DCnH4wkg2zplnl7mbxNSBDX9ejN/exec';
 
 const gsr = (() => {
   let _successFn = null;
