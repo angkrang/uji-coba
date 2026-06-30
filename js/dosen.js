@@ -26,26 +26,24 @@ async function loadDosenDashboard() {
 function _renderDosenSummary(s) {
   if (!s) return;
   document.getElementById('dsnJumlahMhs').textContent = s.jumlahMahasiswaBimbingan;
-  document.getElementById('dsnJumlahSesi').textContent = s.jumlahSesiBimbingan;
-  document.getElementById('dsnTotalDurasi').textContent = s.totalDurasiLabel;
-  document.getElementById('dsnKendalaAktif').textContent = s.jumlahKendalaAktif;
 }
 
 function _renderDosenMahasiswa(list) {
   var body = document.getElementById('dsnMhsBody');
   if (!body) return;
   if (!list || !list.length) {
-    body.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-state-title">Belum ada mahasiswa bimbingan terdaftar</div><div class="empty-state-sub">Pastikan nama Anda di akun Dosen sama dengan kolom "Dosen Pembimbing" pada data mahasiswa.</div></div></td></tr>';
+    body.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-state-title">Belum ada mahasiswa bimbingan terdaftar</div><div class="empty-state-sub">Pastikan nama Anda di akun Dosen sama dengan kolom "Dosen Pembimbing" pada data mahasiswa.</div></div></td></tr>';
     return;
   }
   body.innerHTML = list.map(function(m) {
     return '<tr>'
-      + '<td>' + esc(m.nim) + '</td>'
+      + '<td>' + esc(m.nimLengkap || m.nim) + '</td>'
       + '<td>' + esc(m.nama) + '</td>'
       + '<td>' + esc(m.judulPenelitian||'—') + '</td>'
+      + '<td>' + esc(m.tanggalMulai||'-') + '</td>'
+      + '<td>' + esc(m.tanggalSelesai||'-') + '</td>'
       + '<td>' + esc(m.sisaWaktu||'-') + '</td>'
       + '<td>' + m.jumlahSesi + '</td>'
-      + '<td>' + m.totalDurasiMenit + ' menit</td>'
       + '<td>' + (m.kendalaTerbuka>0
             ? '<span class="badge b-red">'+m.kendalaTerbuka+' aktif</span>'
             : '<span class="badge b-green">Tidak ada</span>') + '</td>'
