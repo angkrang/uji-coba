@@ -26,28 +26,52 @@ async function loadDosenDashboard() {
 function _renderDosenSummary(s) {
   if (!s) return;
   document.getElementById('dsnJumlahMhs').textContent = s.jumlahMahasiswaBimbingan;
+  _renderDosenJenjang(s.sebaranJenjang);
+}
+
+function _renderDosenJenjang(sebaran) {
+  var box = document.getElementById('dsnJenjangBreakdown');
+  if (!box) return;
+  if (!sebaran) { box.innerHTML = ''; return; }
+  var colors = {
+    S1: 'b-blue', S2: 'b-purple', S3: 'b-amber', PKM: 'b-green', Lainnya: 'b-gray'
+  };
+  var labels = {
+    S1: 'Skripsi (S1)', S2: 'Tesis (S2)', S3: 'Disertasi (S3)', PKM: 'PKM', Lainnya: 'Lainnya'
+  };
+  box.innerHTML = Object.keys(labels).map(function(k) {
+    var n = sebaran[k] || 0;
+    return '<span class="badge ' + (colors[k]||'b-gray') + '" style="font-size:12px;padding:6px 12px;">'
+      + esc(labels[k]) + ': <b>' + n + '</b></span>';
+  }).join('');
 }
 
 function _renderDosenMahasiswa(list) {
   var body = document.getElementById('dsnMhsBody');
   if (!body) return;
   if (!list || !list.length) {
-    body.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-state-title">Belum ada mahasiswa bimbingan terdaftar</div><div class="empty-state-sub">Pastikan nama Anda di akun Dosen sama dengan kolom "Dosen Pembimbing" pada data mahasiswa.</div></div></td></tr>';
+    body.innerHTML = '<tr><td colspan="10" style="border:1px solid var(--border,#e2e8f0);"><div class="empty-state"><div class="empty-state-title">Belum ada mahasiswa bimbingan aktif</div><div class="empty-state-sub">Pastikan nama Anda di akun Dosen sama dengan kolom "Dosen Pembimbing" pada data mahasiswa, dan status mahasiswa di Rekap adalah "Aktif".</div></div></td></tr>';
     return;
   }
+  var td = 'style="border:1px solid var(--border,#e2e8f0);"';
   body.innerHTML = list.map(function(m) {
+    var habis = (m.sisaHari !== undefined && m.sisaHari !== null && Number(m.sisaHari) <= 0);
+    var sisaHtml = habis
+      ? '<span style="color:var(--danger,#dc2626);font-weight:700;">' + esc(m.sisaWaktu||'-') + '</span>'
+      : esc(m.sisaWaktu||'-');
     return '<tr>'
-      + '<td>' + esc(m.nimLengkap || m.nim) + '</td>'
-      + '<td>' + esc(m.nama) + '</td>'
-      + '<td>' + esc(m.judulPenelitian||'—') + '</td>'
-      + '<td>' + esc(m.tanggalMulai||'-') + '</td>'
-      + '<td>' + esc(m.tanggalSelesai||'-') + '</td>'
-      + '<td>' + esc(m.sisaWaktu||'-') + '</td>'
-      + '<td>' + m.jumlahSesi + '</td>'
-      + '<td>' + (m.kendalaTerbuka>0
+      + '<td ' + td + '>' + esc(m.nimLengkap || m.nim) + '</td>'
+      + '<td ' + td + '>' + esc(m.nama) + '</td>'
+      + '<td ' + td + '>' + esc(m.judulPenelitian||'—') + '</td>'
+      + '<td ' + td + '><span class="badge b-gray" style="font-size:11px;">' + esc(m.jenjang||'-') + '</span></td>'
+      + '<td ' + td + '>' + esc(m.tanggalMulai||'-') + '</td>'
+      + '<td ' + td + '>' + esc(m.tanggalSelesai||'-') + '</td>'
+      + '<td ' + td + '>' + sisaHtml + '</td>'
+      + '<td ' + td + '>' + m.jumlahSesi + '</td>'
+      + '<td ' + td + '>' + (m.kendalaTerbuka>0
             ? '<span class="badge b-red">'+m.kendalaTerbuka+' aktif</span>'
             : '<span class="badge b-green">Tidak ada</span>') + '</td>'
-      + '<td><button class="btn btn-xs btn-outline" onclick="prefillDosenForm(\''+esc(m.nim)+'\')"><i class="bi bi-plus-circle"></i> Catat Sesi</button></td>'
+      + '<td ' + td + '><button class="btn btn-xs btn-outline" onclick="prefillDosenForm(\''+esc(m.nim)+'\')"><i class="bi bi-plus-circle"></i> Catat Sesi</button></td>'
       + '</tr>';
   }).join('');
 }
