@@ -232,14 +232,14 @@
           <i class="bi bi-grid-1x2"></i> Dashboard
         </a>
       </div>
-      <div class="nav-item-wrap hidden" id="ni-mhs-ext">
-        <a class="nav-link" id="nl-mhs-ext" onclick="goTo('mhs-ext')">
-          <i class="bi bi-person-lines-fill"></i> Data Mahasiswa
-        </a>
-      </div>
       <div class="nav-item-wrap hidden" id="ni-dosen">
         <a class="nav-link" id="nl-dosen" onclick="goTo('dosen')">
           <i class="bi bi-person-workspace"></i> Bimbingan Saya
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-mhs-ext">
+        <a class="nav-link" id="nl-mhs-ext" onclick="goTo('mhs-ext')">
+          <i class="bi bi-person-lines-fill"></i> Data Mahasiswa
         </a>
       </div>
       <div class="nav-item-wrap hidden" id="ni-inv">
@@ -710,16 +710,28 @@
     <div id="sec-dosen" class="hidden">
       <div class="stat-grid" style="margin-bottom:20px;">
         <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="bi bi-people"></i></div>
-          <div class="stat-value" id="dsnJumlahMhs">0</div><div class="stat-label">Mahasiswa Bimbingan</div></div>
+          <div class="stat-value" id="dsnJumlahMhs">0</div><div class="stat-label">Mahasiswa Bimbingan Aktif</div></div>
       </div>
 
       <div class="card" style="margin-bottom:20px;">
         <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
           <h3>Mahasiswa Bimbingan</h3>
         </div>
-        <table class="tbl">
-          <thead><tr><th>NIM</th><th>Nama</th><th>Judul Penelitian</th><th>Mulai Ijin</th><th>Akhir Ijin</th><th>Sisa Waktu</th><th>Jumlah Sesi</th><th>Kendala Aktif</th><th></th></tr></thead>
-          <tbody id="dsnMhsBody"><tr><td colspan="9"><div class="empty-state"><div class="empty-state-title">Memuat data...</div></div></td></tr></tbody>
+        <div id="dsnJenjangBreakdown" style="display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 16px;"></div>
+        <table class="tbl" style="border-collapse:collapse;">
+          <thead><tr>
+            <th style="border:1px solid var(--border,#e2e8f0);">NIM</th>
+            <th style="border:1px solid var(--border,#e2e8f0);">Nama</th>
+            <th style="border:1px solid var(--border,#e2e8f0);min-width:280px;width:32%;">Judul Penelitian</th>
+            <th style="border:1px solid var(--border,#e2e8f0);">Jenjang</th>
+            <th style="border:1px solid var(--border,#e2e8f0);">Mulai Ijin</th>
+            <th style="border:1px solid var(--border,#e2e8f0);">Akhir Ijin</th>
+            <th style="border:1px solid var(--border,#e2e8f0);">Sisa Waktu</th>
+            <th style="border:1px solid var(--border,#e2e8f0);">Jumlah Sesi</th>
+            <th style="border:1px solid var(--border,#e2e8f0);">Kendala Aktif</th>
+            <th style="border:1px solid var(--border,#e2e8f0);"></th>
+          </tr></thead>
+          <tbody id="dsnMhsBody"><tr><td colspan="10" style="border:1px solid var(--border,#e2e8f0);"><div class="empty-state"><div class="empty-state-title">Memuat data...</div></div></td></tr></tbody>
         </table>
       </div>
 
