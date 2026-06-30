@@ -1,0 +1,46 @@
+PATCH UNTUK Code.gs — TAMBAHKAN KE DALAM "var ROUTES = { ... }"
+================================================================
+Buka Code.gs yang asli, cari baris:
+
+    getSurveiRekapPeriode: { roles: ['Admin'], handler: function(p) { return getSurveiRekapPeriode(p.periode); } }
+  };
+
+Itu adalah baris TERAKHIR sebelum tanda "};" penutup ROUTES.
+Ubah jadi begini (tambahkan koma di baris getSurveiRekapPeriode,
+lalu tempel 6 route baru sebelum "};"):
+
+    getSurveiRekapPeriode: { roles: ['Admin'], handler: function(p) { return getSurveiRekapPeriode(p.periode); } },
+
+    /* ====== FITUR DOSEN (BARU) ====== */
+    getDosenDashboard : { roles: ['Dosen', 'Admin'], handler: function(p, a) {
+      var dosenNama = (a.sess.role === 'Dosen') ? a.sess.nama : (p.dosenNama || '');
+      return getDosenDashboard(dosenNama);
+    } },
+    getBimbinganLog : { roles: ['Dosen', 'Admin'], handler: function(p, a) {
+      var dosenNama = (a.sess.role === 'Dosen') ? a.sess.nama : (p.dosenNama || '');
+      return getBimbinganLog(dosenNama);
+    } },
+    addBimbinganLog : { roles: ['Dosen', 'Admin'], handler: function(p, a) {
+      var obj = p.obj || p;
+      if (a.sess.role === 'Dosen') obj.dosenNama = a.sess.nama;
+      obj.inputOleh = a.sess.nama + ' (' + a.sess.username + ')';
+      return addBimbinganLog(obj);
+    } },
+    updateBimbinganLog : { roles: ['Dosen', 'Admin'], handler: function(p, a) {
+      var obj = p.obj || p;
+      return updateBimbinganLog(obj, a.sess);
+    } },
+    deleteBimbinganLog : { roles: ['Dosen', 'Admin'], handler: function(p, a) { return deleteBimbinganLog(p.id, a.sess); } },
+    getDosenList       : { roles: ['Admin'], handler: function() { return getDosenList(); } }
+  };
+
+ITU SAJA — tidak ada perubahan lain yang dibutuhkan di Code.gs asli.
+Fungsi-fungsi getDosenDashboard, getBimbinganLog, addBimbinganLog,
+updateBimbinganLog, deleteBimbinganLog, getDosenList, dan helper-nya
+semuanya ada di file terpisah "backend_dosen_addon.gs" — tinggal
+tempel sebagai file .gs baru di project Apps Script yang sama
+(klik "+" di sidebar editor Apps Script → Script → beri nama
+"DosenFeature" → paste isinya).
+
+Setelah disimpan, klik Deploy → Manage deployments → edit deployment
+yang aktif → New version → Deploy (supaya endpoint /exec memakai kode terbaru).

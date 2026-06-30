@@ -1,0 +1,291 @@
+/* ============================================================
+   STYLE-PATCH.CSS
+   Muat TERAKHIR, setelah style.css dan style-mobile.css:
+     <link rel="stylesheet" href="css/style.css">
+     <link rel="stylesheet" href="css/style-mobile.css">
+     <link rel="stylesheet" href="css/style-patch.css">
+   ============================================================ */
+
+
+/* ============================================================
+   1. DESKTOP — SCROLL FIX
+   Pastikan body & #appWrap tidak memblokir scroll vertikal
+   ============================================================ */
+
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto;   /* paksa selalu bisa scroll vertikal */
+  height: auto;
+}
+
+#appWrap {
+  display: block;     /* hapus potensi flex/grid yang collapse height */
+  min-height: 100vh;
+}
+
+
+/* ============================================================
+   2. MOBILE — SCROLL FIX
+   Hapus semua overflow yang mengunci halaman di mobile
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  html, body {
+    height: auto !important;
+    min-height: 100%;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;       /* KUNCI: jangan pernah hidden/clip */
+    overscroll-behavior-y: auto;       /* cabut contain agar native scroll jalan */
+  }
+
+  /* appWrap harus mengalir secara normal, bukan fixed/absolute */
+  #appWrap {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 100dvh;
+    overflow: visible !important;
+  }
+
+  /* mainContent: buang height & overflow yang mengunci */
+  #mainContent {
+    height: auto !important;
+    min-height: calc(100dvh - 56px);
+    overflow-x: hidden !important;
+    overflow-y: visible !important;   /* konten mengalir ke body, bukan terkunci di sini */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Saat sidebar terbuka, body.overflow:hidden dari JS harus
+     tetap memblokir scroll BODY tapi mainContent tetap normal.
+     Ini ditangani oleh JS toggleSidebar() yang sudah ada —
+     tidak perlu CSS tambahan. */
+}
+
+
+/* ============================================================
+   3. CHART / CANVAS — RESPONSIVE FIX
+   Chart.js butuh container dengan height eksplisit.
+   Saat grid stack jadi 1 kolom, chart-wrap jangan collapse.
+   ============================================================ */
+
+/* Desktop — ukuran standar */
+.chart-wrap {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  min-height: 220px;
+}
+
+.chart-wrap canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Mobile — tinggi lebih kecil agar tidak terlalu tinggi */
+@media (max-width: 768px) {
+  .chart-wrap {
+    height: 220px !important;
+    min-height: 180px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-wrap {
+    height: 180px !important;
+    min-height: 140px !important;
+  }
+}
+
+
+/* ============================================================
+   4. GRID ADMIN DASHBOARD — Top 10 + Kalibrasi
+   Grid "1fr 1.6fr" di-stack jadi 1 kolom di mobile;
+   pastikan kedua card mendapat height yang benar.
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* Container grid 1fr 1.6fr → sudah ditangani style-mobile.css
+     tapi kita pastikan card di dalamnya punya sizing yang benar */
+
+  /* Card kalibrasi & Top 10 (anak dari grid 1fr 1.6fr) */
+  [style*="grid-template-columns:1fr 1.6fr"] > .card,
+  [style*="grid-template-columns: 1fr 1.6fr"] > .card {
+    margin-bottom: 12px !important;
+    width: 100% !important;
+  }
+
+  /* Tab nav chart jangan overflow */
+  #cp-bahan,
+  #cp-alat {
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+}
+
+
+/* ============================================================
+   5. CHART.JS — pastikan resize trigger saat grid berubah
+   Ini CSS saja tidak cukup; tambahkan juga JS di bawah.
+   Petunjuk: tambahkan snippet JS ini ke nav.js atau misc.js
+   setelah fungsi goTo():
+
+   window.addEventListener('resize', function() {
+     if (window._chartBahan) window._chartBahan.resize();
+     if (window._chartAlat)  window._chartAlat.resize();
+   });
+
+   Dan saat switchChart() dipanggil:
+   setTimeout(function() {
+     if (t === 'bahan' && window._chartBahan) window._chartBahan.resize();
+     if (t === 'alat'  && window._chartAlat)  window._chartAlat.resize();
+   }, 50);
+   ============================================================ */
+
+
+/* ============================================================
+   6. SIDEBAR BACKDROP — z-index safety
+   ============================================================ */
+
+#sidebarBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1199;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+#sidebarBackdrop.show {
+  display: block;
+}
+/* ============================================================
+   7. MOBILE TOPBAR — fixed di atas, tidak ikut scroll
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #mobileTopbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1100 !important;
+  }
+
+  /* mainContent mulai di bawah topbar */
+  #mainContent {
+    padding-top: 68px !important;
+  }
+}
+/* ============================================================
+   8. SAFE AREA — iPhone notch / home bar
+   ============================================================ */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    #mainContent {
+      padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+    }
+  }
+}
+/* ============================================================
+   9. SWEETALERT2 — pastikan selalu di atas modal-overlay (z:9000)
+   ============================================================ */
+.swal2-container {
+  z-index: 10000 !important;
+}
+
+/* ============================================================
+   10. FORMULIR TAGIHAN BAHAN KIMIA
+   Layout meniru "Formulir Penggunaan Bahan Kimia Untuk Penelitian"
+   (Departemen TPHP UGM) — dipakai di ringkasan mahasiswa, modal
+   detail admin, dan export laporan.
+   ============================================================ */
+.tagihan-form {
+  background: #fff;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 13px;
+}
+ 
+.tagihan-form-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+ 
+.tagihan-form-header-row {
+  display: flex;
+  gap: 6px;
+  padding: 2px 0;
+  line-height: 1.4;
+}
+ 
+.tagihan-form-header-label {
+  flex: 0 0 150px;
+  color: var(--muted, #64748b);
+}
+ 
+.tagihan-form-header-sep { flex: 0 0 10px; }
+ 
+.tagihan-form-header-value {
+  flex: 1;
+  font-weight: 600;
+  border-bottom: 1px dotted var(--border, #cbd5e1);
+  min-height: 18px;
+}
+.tagihan-form-header-value.is-blank {
+  color: transparent; /* garis titik-titik kosong, siap ditulis tangan */
+}
+ 
+.tagihan-form-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+ 
+.tagihan-form-table th,
+.tagihan-form-table td {
+  border: 1px solid var(--border, #e2e8f0);
+  padding: 6px 8px;
+  font-size: 12.5px;
+}
+ 
+.tagihan-form-table thead th {
+  background: #f8fafc;
+  font-weight: 700;
+  text-align: center;
+  color: #334155;
+}
+ 
+.tagihan-form-table td.col-no { text-align: center; width: 36px; color: var(--muted, #64748b); }
+.tagihan-form-table td.col-jumlah { text-align: center; white-space: nowrap; }
+.tagihan-form-table td.col-harga,
+.tagihan-form-table td.col-total { text-align: right; white-space: nowrap; }
+ 
+.tagihan-form-table tfoot td {
+  font-weight: 700;
+  background: #f8fafc;
+}
+.tagihan-form-table tfoot td.label { text-align: right; }
+.tagihan-form-table tfoot td.value { text-align: right; color: var(--warning, #b45309); }
+.tagihan-form-table tfoot tr.total-row td { font-size: 14px; }
+ 
+.tagihan-form-terbilang {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border, #e2e8f0);
+  font-size: 12.5px;
+}
+.tagihan-form-terbilang .label { color: var(--muted, #64748b); margin-right: 6px; }
+.tagihan-form-terbilang .value { font-style: italic; font-weight: 600; }
+ 
+/* Versi cetak/PDF (export laporan) — sedikit lebih ringkas margin/border */
+.tagihan-form.print-mode {
+  font-size: 12px;
+  border-color: #000;
+}
+.tagihan-form.print-mode .tagihan-form-table th,
+.tagihan-form.print-mode .tagihan-form-table td {
+  border-color: #000;
+}

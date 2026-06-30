@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>LabInventory — Sistem Informasi Laboratorium</title>
+
+  <!-- ============================================================
+       PWA — Manifest & Ikon
+       ============================================================ -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Sistem Informasi Inventaris Laboratorium Kimia dan Biokimia Pangan dan Hasil Pertanian">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
+  <link rel="shortcut icon" href="assets/favicon-32x32.png">
+
+  <!-- Android / Chrome: tampilkan sebagai aplikasi standalone saat ditambahkan ke layar utama -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="LabInventory">
+
+  <!-- iOS Safari: tampilkan sebagai aplikasi standalone (tanpa address bar) saat "Add to Home Screen" -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LabInventory">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <script>
+    if (typeof Chart !== 'undefined' && typeof ChartDataLabels !== 'undefined') {
+      Chart.register(ChartDataLabels);
+    }
+  </script>
+
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Inter', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50:'#eef4ff', 100:'#dce9ff', 200:'#b9d3ff', 300:'#82afff',
+              400:'#4a84ff', 500:'#1a56db', 600:'#1245b8', 700:'#0f3896',
+              800:'#0c2d7a', 900:'#0a2260',
+            },
+            slate: { 850:'#1a2234', 950:'#0a0f1e' }
+          },
+          boxShadow: {
+            'glow':    '0 0 20px rgba(26,86,219,0.15)',
+            'glow-lg': '0 0 40px rgba(26,86,219,0.2)',
+            'card':    '0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04)',
+          },
+          animation: {
+            'fade-in':    'fadeIn 0.4s ease forwards',
+            'slide-up':   'slideUp 0.4s ease forwards',
+            'pulse-slow': 'pulse 3s ease-in-out infinite',
+            'progress':   'progress 2.5s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeIn:   { from:{opacity:'0'}, to:{opacity:'1'} },
+            slideUp:  { from:{opacity:'0',transform:'translateY(16px)'}, to:{opacity:'1',transform:'translateY(0)'} },
+            progress: { '0%':{width:'0%'}, '60%':{width:'80%'}, '100%':{width:'100%'} },
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style-mobile.css">
+  <link rel="stylesheet" href="css/style-patch.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SPLASH SCREEN
+     ============================================================ -->
+<div id="splashScreen">
+  <div class="splash-logo">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0l-3 6h12l-3-6M9 14h6"/>
+    </svg>
+  </div>
+  <div style="text-align:center;">
+    <div style="font-family:'Inter',sans-serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.5px;">LabInventory</div>
+    <div style="font-size:12px;color:#60a5fa;margin-top:3px;">Menyiapkan sistem, harap tunggu…</div>
+  </div>
+  <div class="splash-progress-track">
+    <div class="splash-progress-bar"></div>
+  </div>
+  <div style="font-size:11px;color:#334155;" id="splashHint">Memuat komponen antarmuka...</div>
+</div>
+
+<!-- ============================================================
+     LOGIN PAGE
+     ============================================================ -->
+<div id="loginPage">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#1a56db,#4a84ff);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 24px rgba(26,86,219,0.3);">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0l-3 6h12l-3-6M9 14h6"/>
+        </svg>
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:#0f172a;letter-spacing:-0.5px;">Lab Inventory</div>
+      <div style="font-size:12.5px;color:#64748b;margin-top:4px;line-height:1.4;max-width:280px;margin-inline:auto;">Sistem Informasi Inventaris Laboratorium Kimia dan Biokimia Pangan dan Hasil Pertanian</div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label class="form-label">Username / NIM</label>
+      <div style="position:relative;">
+        <i class="bi bi-person" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:16px;"></i>
+        <input type="text" id="loginUser" class="login-input" style="padding-left:38px;" placeholder="Masukkan NIM atau NIP">
+      </div>
+    </div>
+    <div style="margin-bottom:22px;">
+      <label class="form-label">Password</label>
+      <div style="position:relative;">
+        <i class="bi bi-lock" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:16px;"></i>
+        <input type="password" id="loginPass" class="login-input" style="padding-left:38px;" placeholder="••••••••">
+        <button onclick="togglePasswordVisibility()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;" id="togglePassBtn">
+          <i class="bi bi-eye" id="togglePassIcon"></i>
+        </button>
+      </div>
+    </div>
+    <!-- ── Petunjuk Login ── -->
+<div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+  <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+    <i class="bi bi-info-circle-fill" style="color:#1a56db;font-size:15px;"></i>
+    <span style="font-size:12.5px;font-weight:700;color:#1e3a8a;">Petunjuk Login Mahasiswa</span>
+  </div>
+
+  <!-- Username -->
+  <div style="margin-bottom:9px;">
+    <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;">
+      <i class="bi bi-person" style="margin-right:3px;"></i>Username
+    </div>
+    <div style="font-size:12.5px;color:#334155;margin-bottom:5px;">
+      6 digit NIU tengah dari nomor NIM Anda
+    </div>
+    <div style="font-family:'Courier New',monospace;font-size:12px;display:flex;align-items:center;gap:2px;flex-wrap:wrap;">
+      <span style="color:#94a3b8;">xx/</span><span style="background:#dbeafe;color:#1e40af;padding:2px 9px;border-radius:5px;font-weight:700;border:1px solid #bfdbfe;">321123</span><span style="color:#94a3b8;">/xx/xxxxx</span>
+      <span style="color:#64748b;font-family:'Inter',sans-serif;font-size:11.5px;margin-left:6px;">→ username: <strong style="color:#1e293b;">321123</strong></span>
+    </div>
+  </div>
+
+  <!-- Divider tipis -->
+  <div style="border-top:1px solid #dbeafe;margin:9px 0;"></div>
+
+  <!-- Password -->
+  <div>
+    <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;">
+      <i class="bi bi-lock" style="margin-right:3px;"></i>Password
+    </div>
+    <div style="font-size:12.5px;color:#334155;margin-bottom:5px;">
+      Inisial nama (huruf kapital) + 3 angka terakhir NIU
+    </div>
+    <div style="font-size:12px;color:#475569;margin-bottom:4px;">
+      Contoh: <span style="font-weight:600;color:#1e293b;">Naura Balqis Anggraeni</span>
+      &nbsp;·&nbsp; NIM xx/321<span style="font-weight:700;color:#1e40af;">123</span>/xx/xxxxx
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:12px;color:#475569;">→ password:</span>
+      <span style="font-family:'Courier New',monospace;font-weight:700;font-size:13px;background:#dcfce7;color:#166534;padding:2px 12px;border-radius:5px;border:1px solid #bbf7d0;letter-spacing:2px;">NBA123</span>
+      <span style="font-size:11px;color:#64748b;font-style:italic;">(gunakan CAPSLOCK)</span>
+    </div>
+  </div>
+</div>
+
+    <button class="login-btn" onclick="doLogin()" id="loginBtn">
+      <i class="bi bi-box-arrow-in-right"></i>
+      Masuk ke Sistem
+    </button>
+
+    <div style="text-align:center;margin-top:18px;font-size:12px;color:#94a3b8;">
+      Sistem informasi inventaris laboratorium resmi
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP WRAPPER
+     ============================================================ -->
+<div id="appWrap" class="hidden">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0l-3 6h12l-3-6M9 14h6"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-brand-name">LabInventory</div>
+        <div class="sidebar-brand-sub" id="sidebarRole">—</div>
+      </div>
+    </div>
+
+    <div class="nav-scroller" id="navScroller">
+      <div class="nav-group-label">Menu Utama</div>
+      <div class="nav-item-wrap">
+        <a class="nav-link active" id="nl-dash" onclick="goTo('dash')">
+          <i class="bi bi-grid-1x2"></i> Dashboard
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-mhs-ext">
+        <a class="nav-link" id="nl-mhs-ext" onclick="goTo('mhs-ext')">
+          <i class="bi bi-person-lines-fill"></i> Data Mahasiswa
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-dosen">
+        <a class="nav-link" id="nl-dosen" onclick="goTo('dosen')">
+          <i class="bi bi-person-workspace"></i> Bimbingan Saya
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-inv">
+        <a class="nav-link" id="nl-inv" onclick="goTo('inv')">
+          <i class="bi bi-box-seam"></i> Inventaris
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-req">
+        <a class="nav-link" id="nl-req" onclick="goTo('req')">
+          <i class="bi bi-clipboard-check"></i> Permintaan &amp; Pinjam
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-ret">
+        <a class="nav-link" id="nl-ret" onclick="goTo('ret')">
+          <i class="bi bi-arrow-return-left"></i> Pengembalian Alat
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-pay">
+        <a class="nav-link" id="nl-pay" onclick="goTo('pay')">
+          <i class="bi bi-receipt"></i> Tagihan Bahan
+          <span class="nav-badge hidden" id="navBadgePay">0</span>
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-pem">
+        <a class="nav-link" id="nl-pem" onclick="goTo('pem')">
+          <i class="bi bi-people"></i> Peminjaman Alat
+          <span class="nav-badge hidden" id="navBadgeRet">0</span>
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-user">
+        <a class="nav-link" id="nl-user" onclick="goTo('user')">
+          <i class="bi bi-person-gear"></i> Kelola User
+        </a>
+      </div>
+
+      <div class="nav-group-label hidden" id="nl-survei-label">Survei &amp; Masukan</div>
+      <div class="nav-item-wrap hidden" id="ni-survei">
+        <a class="nav-link" id="nl-survei" onclick="goTo('survei')">
+          <i class="bi bi-emoji-smile"></i> Survei Kepuasan
+        </a>
+      </div>
+
+      <div class="nav-group-label hidden" id="nl-admin-label">Laporan &amp; Log</div>
+      <div class="nav-item-wrap hidden" id="ni-export">
+        <a class="nav-link" id="nl-export" onclick="goTo('export')">
+          <i class="bi bi-download"></i> Export Laporan
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-audit">
+        <a class="nav-link" id="nl-audit" onclick="goTo('audit')">
+          <i class="bi bi-journal-text"></i> Audit Log
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-maint">
+        <a class="nav-link" id="nl-maint" onclick="goTo('maint')">
+          <i class="bi bi-wrench-adjustable"></i> Maintenance
+        </a>
+      </div>
+      <div class="nav-item-wrap hidden" id="ni-waste">
+        <a class="nav-link" id="nl-waste" onclick="goTo('waste')">
+          <i class="bi bi-trash3"></i> Limbah
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="sidebarUserCard">
+        <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
+        <div>
+          <div class="sidebar-user-name" id="sidebarUserName">—</div>
+          <div class="sidebar-user-role" id="sidebarUserRole">—</div>
+        </div>
+      </div>
+      <a class="nav-link" onclick="doLogout()" style="color:#f87171 !important;margin-top:2px;">
+        <i class="bi bi-box-arrow-left"></i> Keluar dari Sistem
+      </a>
+    </div>
+  </nav>
+
+<!-- MOBILE TOP BAR -->
+<div id="mobileTopbar" style="min-height:56px;max-height:56px;overflow:hidden;">
+  <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+    <!-- Hamburger -->
+    <button onclick="toggleSidebar()"
+      style="width:36px;height:36px;min-width:36px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <!-- Logo -->
+    <div style="width:30px;height:30px;min-width:30px;background:linear-gradient(135deg,#1a56db,#4a84ff);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0l-3 6h12l-3-6M9 14h6"/>
+      </svg>
+    </div>
+    <!-- Judul -->
+    <div style="min-width:0;overflow:hidden;">
+      <div style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="mtTitle">Dashboard</div>
+      <div style="font-size:10px;color:#475569;font-weight:500;" id="mtRole">—</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+    <!-- Bell -->
+    <div onclick="goTo('pay')"
+         style="width:34px;height:34px;min-width:34px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span id="bellBadge" style="display:none;position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;pointer-events:none;"></span>
+    </div>
+    <!-- Avatar -->
+    <div onclick="toggleSidebar()"
+         style="width:34px;height:34px;min-width:34px;border-radius:50%;background:linear-gradient(135deg,#1a56db,#4a84ff);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.15);cursor:pointer;"
+         id="mtAvatar">U</div>
+  </div>
+</div>
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-sub">Sistem Informasi Inventaris Laboratorium Kimia dan Biokimia Pangan dan Hasil Pertanian</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-user">
+          <div class="topbar-avatar" id="userAvatar">U</div>
+          <div>
+            <div class="topbar-name" id="userChipName">—</div>
+            <div class="topbar-role" id="userChipRole">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         SECTION: ADMIN DASHBOARD
+         ====================================================== -->
+    <div id="sec-dash-admin" class="hidden">
+      <div class="card" style="margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <div class="card-title" style="margin-bottom:0;">
+            <i class="bi bi-mortarboard" style="color:var(--primary);margin-right:8px;"></i>Identitas Mahasiswa Aktif
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="openModalAllStudents()">
+            <i class="bi bi-people"></i> Lihat Semua Mahasiswa
+          </button>
+        </div>
+        <div id="adminStudentList">
+          <div style="display:flex;gap:10px;">
+            <div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div>
+            <div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div>
+            <div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div>
+            <div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div>
+            <div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div>
+          </div>
+        </div>
+      </div>
+       <div class="grid-4" style="margin-bottom:20px;">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dbeafe;color:#1e40af;"><i class="bi bi-droplet-half"></i></div>
+          <div class="stat-val" id="st-bahan">—</div>
+          <div class="stat-label">Total Bahan Kimia</div>
+          <a class="stat-action" onclick="goTo('inv')">Lihat inventaris <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dcfce7;color:#166534;"><i class="bi bi-tools"></i></div>
+          <div class="stat-val" id="st-alat">—</div>
+          <div class="stat-label">Total Alat</div>
+          <a class="stat-action" onclick="goTo('inv')">Lihat inventaris <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="stat-card" id="statKritisCard">
+          <div class="stat-icon" style="background:#fee2e2;color:#991b1b;"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="stat-val" id="st-kritis">—</div>
+          <div class="stat-label">Item hampir habis</div>
+          <a class="stat-action" id="statKritisAction" onclick="goTo('inv')" style="color:#dc2626;">Tambah stok <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="stat-card" id="statPayCard">
+          <div class="stat-icon" style="background:#fef3c7;color:#92400e;"><i class="bi bi-receipt"></i></div>
+          <div class="stat-val" id="st-pay">—</div>
+          <div class="stat-label">Tagihan menunggu konfirmasi</div>
+          <a class="stat-action" id="statPayAction" onclick="goTo('pay')" style="color:#d97706;">Proses sekarang <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;">
+            <i class="bi bi-mortarboard" style="color:#7c3aed;margin-right:8px;"></i>Rekap Data Mahasiswa Keseluruhan
+          </div>
+          <a style="font-size:12px;color:var(--primary);cursor:pointer;font-weight:600;" onclick="goTo('mhs-ext')">Lihat Semua →</a>
+        </div>
+        <div id="mhsExtSummary">
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+            <div class="skeleton" style="height:64px;border-radius:10px;"></div>
+            <div class="skeleton" style="height:64px;border-radius:10px;"></div>
+            <div class="skeleton" style="height:64px;border-radius:10px;"></div>
+            <div class="skeleton" style="height:64px;border-radius:10px;"></div>
+            <div class="skeleton" style="height:64px;border-radius:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:18px;">
+        <div class="card" style="margin-bottom:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="card-title" style="margin-bottom:0;font-size:13.5px;">
+              <i class="bi bi-calendar-check" style="color:#7c3aed;margin-right:6px;"></i>Jadwal Kalibrasi
+            </div>
+            <a style="font-size:12px;color:var(--primary);cursor:pointer;font-weight:600;" onclick="goTo('maint')">Semua →</a>
+          </div>
+          <div id="kalibrasiList">
+            <div class="skeleton" style="height:56px;border-radius:8px;margin-bottom:6px;"></div>
+            <div class="skeleton" style="height:56px;border-radius:8px;margin-bottom:6px;"></div>
+            <div class="skeleton" style="height:56px;border-radius:8px;"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div class="card-title" style="margin-bottom:0;font-size:13.5px;">
+              <i class="bi bi-bar-chart-fill" style="color:var(--primary);margin-right:6px;"></i>Top 10 Penggunaan
+            </div>
+          </div>
+          <div class="tab-nav">
+            <button class="tab-btn active" id="tc-bahan" onclick="switchChart('bahan')">
+              <i class="bi bi-droplet-half"></i> Bahan Kimia
+            </button>
+            <button class="tab-btn" id="tc-alat" onclick="switchChart('alat')">
+              <i class="bi bi-tools"></i> Alat
+            </button>
+          </div>
+          <div id="cp-bahan" class="chart-wrap"><canvas id="chartBahan"></canvas></div>
+          <div id="cp-alat" class="chart-wrap hidden"><canvas id="chartAlat"></canvas></div>
+        </div>
+      </div>
+      <!-- Tren Kepuasan Survei -->
+      <div class="card" style="margin-top:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+          <div class="card-title" style="margin-bottom:0;font-size:13.5px;">
+            <i class="bi bi-emoji-smile" style="color:#059669;margin-right:6px;"></i>Tren Kepuasan Pengguna Lab
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <select id="surveiTrenMode" onchange="loadSurveiTren()" style="font-size:11.5px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--border);color:var(--text);background:var(--surface);">
+              <option value="triwulan">Per Triwulan</option>
+              <option value="tahun">Per Tahun</option>
+            </select>
+            <a style="font-size:12px;color:var(--primary);cursor:pointer;font-weight:600;" onclick="goTo('survei')">Lihat Data →</a>
+          </div>
+        </div>
+        <div id="surveiTrenWrap">
+          <div style="display:flex;gap:10px;margin-bottom:14px;">
+            <div class="skeleton" style="height:64px;flex:1;border-radius:10px;"></div>
+            <div class="skeleton" style="height:64px;flex:1;border-radius:10px;"></div>
+            <div class="skeleton" style="height:64px;flex:1;border-radius:10px;"></div>
+            <div class="skeleton" style="height:64px;flex:1;border-radius:10px;"></div>
+          </div>
+          <div class="skeleton" style="height:220px;border-radius:10px;"></div>
+        </div>
+      </div>
+    </div><!-- /sec-dash-admin -->
+
+    <!-- ======================================================
+         SECTION: MAHASISWA DASHBOARD
+         ====================================================== -->
+    <div id="sec-dash-mhs" class="hidden">
+      <!-- Onboarding callout (tetap) -->
+      <div class="callout callout-info" id="onboardingCallout" style="display:none;">
+        <div class="callout-icon" style="color:#1e40af;"><i class="bi bi-lightbulb"></i></div>
+        <div>
+          <div class="callout-title" style="color:#1e40af;">Panduan Penggunaan Sistem</div>
+          <div class="callout-body" style="color:#1e40af;">
+            <strong>Langkah 1:</strong> Lihat ketersediaan bahan &amp; alat di menu <em>Inventaris</em>
+            &nbsp;→&nbsp; <strong>Langkah 2:</strong> Ajukan permintaan di menu <em>Permintaan &amp; Pinjam</em>
+            &nbsp;→&nbsp; <strong>Langkah 3:</strong> Kembalikan alat &amp; lunasi tagihan untuk <em>Bebas Lab</em>
+          </div>
+        </div>
+        <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:#1e40af;font-size:16px;margin-left:auto;flex-shrink:0;"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <!-- ROW 1: Profile + Stat Cards -->
+      <div class="db-top-row">
+
+        <!-- Profile Card -->
+        <div class="db-profile-card">
+          <div class="db-prof-avatar" id="mhsAvatarCircle">B</div>
+          <div class="db-prof-name" id="mhsProfileName">—</div>
+          <div class="db-prof-nim" id="mhsProfileNim">—</div>
+          <div id="mhsProfileRows"></div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="db-stats-grid">
+          <div class="db-stat-card">
+            <div class="db-stat-icon db-stat-blue"><i class="bi bi-droplet-half"></i></div>
+            <div class="db-stat-value" id="stMhsBahan">—</div>
+            <div class="db-stat-label">Bahan dipinjam</div>
+          </div>
+          <div class="db-stat-card">
+            <div class="db-stat-icon db-stat-teal"><i class="bi bi-tools"></i></div>
+            <div class="db-stat-value" id="stMhsAlat">—</div>
+            <div class="db-stat-label">Alat dipinjam</div>
+          </div>
+          <div class="db-stat-card">
+            <div class="db-stat-icon db-stat-green"><i class="bi bi-shield-check"></i></div>
+            <div class="db-stat-value">✓</div>
+            <div class="db-stat-label">Bebas lab</div>
+            <div class="db-stat-pill">Disetujui</div>
+          </div>
+        </div>
+      </div>
+
+  <!-- ROW 2: Aksi Cepat | Bebas Lab | Time Tracker -->
+  <div class="db-mid-row">
+
+    <!-- Aksi Cepat -->
+    <div class="db-card">
+      <div class="db-card-title"><i class="bi bi-bolt"></i> Aksi cepat</div>
+      <div class="db-action-item" onclick="openReqModal('bahan')"
+           onmouseover="this.style.borderColor='var(--primary)'"
+           onmouseout="this.style.borderColor='var(--border)'">
+        <div class="db-action-icon db-action-blue"><i class="bi bi-droplet-half"></i></div>
+        <div class="db-action-text">
+          <p>Minta Bahan Kimia</p>
+          <span>Ajukan permintaan langsung dari sistem</span>
+        </div>
+        <i class="bi bi-chevron-right db-action-arrow"></i>
+      </div>
+      <div class="db-action-item" onclick="openReqModal('alat')"
+           onmouseover="this.style.borderColor='var(--success)'"
+           onmouseout="this.style.borderColor='var(--border)'">
+        <div class="db-action-icon db-action-teal"><i class="bi bi-tools"></i></div>
+        <div class="db-action-text">
+          <p>Pinjam Alat Lab</p>
+          <span>Ajukan peminjaman alat langsung</span>
+        </div>
+        <i class="bi bi-chevron-right db-action-arrow"></i>
+      </div>
+    </div>
+
+    <!-- Status Bebas Lab -->
+    <div class="db-card" id="bebasLabBannerCard">
+      <div class="db-card-header">
+        <div class="db-card-title" style="margin:0;"><i class="bi bi-patch-check"></i> Syarat bebas lab</div>
+        <button class="btn btn-sm btn-outline" onclick="goTo('pay')">Proses <i class="bi bi-arrow-right"></i></button>
+      </div>
+      <div id="bebasLabBannerBody">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="skeleton" style="height:46px;border-radius:10px;"></div>
+          <div class="skeleton" style="height:46px;border-radius:10px;"></div>
+          <div class="skeleton" style="height:46px;border-radius:10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Tracker Izin Penelitian -->
+    <div class="db-card db-tracker-card">
+      <div class="db-card-title"><i class="bi bi-clock"></i> Izin penelitian</div>
+      <div class="db-tracker-body">
+        <!-- Donut SVG -->
+        <div class="db-donut-wrap">
+          <svg id="trackerDonut" width="130" height="130" viewBox="0 0 130 130"
+               role="img" aria-label="Lingkaran waktu izin penelitian">
+            <title>Waktu izin penelitian</title>
+            <!-- Track luar -->
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#E6F1FB" stroke-width="13"/>
+            <!-- Fill luar (total terpakai) — dasharray diupdate JS -->
+            <circle id="donutOuter" cx="65" cy="65" r="52" fill="none"
+                    stroke="#1a56db" stroke-width="13"
+                    stroke-dasharray="0 327" stroke-dashoffset="82"
+                    stroke-linecap="round"/>
+            <!-- Track dalam -->
+            <circle cx="65" cy="65" r="33" fill="none" stroke="#FFFBEB" stroke-width="9"/>
+            <!-- Fill dalam (fase aktif) -->
+            <circle id="donutInner" cx="65" cy="65" r="33" fill="none"
+                    stroke="#d97706" stroke-width="9"
+                    stroke-dasharray="0 207" stroke-dashoffset="52"
+                    stroke-linecap="round"/>
+            <text id="donutPct" x="65" y="60" text-anchor="middle"
+                  font-size="17" font-weight="700" fill="#1a56db">—%</text>
+            <text x="65" y="75" text-anchor="middle"
+                  font-size="10" fill="#888780">terpakai</text>
+          </svg>
+          <div class="db-donut-legend">
+            <span><span class="db-legend-dot" style="background:#1a56db;"></span>Total</span>
+            <span><span class="db-legend-dot" style="background:#d97706;"></span>Aktif</span>
+          </div>
+        </div>
+        <!-- Stat ringkas -->
+        <div class="db-tracker-stats">
+          <div class="db-tracker-stat">
+            <span class="db-tstat-label">Total izin</span>
+            <span class="db-tstat-value" id="trackerTotal">— hari</span>
+          </div>
+          <div class="db-tracker-stat">
+            <span class="db-tstat-label">Terpakai</span>
+            <span class="db-tstat-value" id="trackerUsed" style="color:#1a56db;">— hari</span>
+          </div>
+          <div class="db-tracker-stat">
+            <span class="db-tstat-label">Sisa waktu</span>
+            <span class="db-tstat-value" id="trackerLeft" style="color:#d97706;">— hari</span>
+          </div>
+          <div class="db-tracker-stat">
+            <span class="db-tstat-label">Fase aktif</span>
+            <span class="db-tstat-value" id="trackerPhase" style="font-size:11px;color:var(--muted);">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /db-mid-row -->
+
+  <!-- ROW 3: Akumulasi Barang -->
+  <div class="card" style="margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div class="card-title" style="margin-bottom:0;">Akumulasi barang dipinjam</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-sm btn-outline" onclick="exportMhsBahan()"><i class="bi bi-file-earmark-spreadsheet"></i> Excel Bahan</button>
+        <button class="btn btn-sm btn-outline" onclick="printMhsBahan()"><i class="bi bi-printer"></i> Cetak Bahan</button>
+        <button class="btn btn-sm btn-outline" onclick="exportMhsAlat()"><i class="bi bi-file-earmark-spreadsheet"></i> Excel Alat</button>
+        <button class="btn btn-sm btn-outline" onclick="printMhsAlat()"><i class="bi bi-printer"></i> Cetak Alat</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      <div id="mhsSumBahan"><div class="skeleton" style="height:80px;border-radius:8px;"></div></div>
+      <div id="mhsSumAlat"></div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Log Aktivitas -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div class="card-title" style="margin-bottom:0;">Riwayat log aktivitas</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Item</th>
+            <th>Jumlah</th>
+            <th>Tipe</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="mhsHistBody">
+          <tr><td colspan="5">
+            <div class="empty-state">
+              <div class="empty-state-icon">📋</div>
+              <div class="empty-state-title">Belum ada aktivitas</div>
+              <div class="empty-state-sub">Riwayat permintaan bahan dan peminjaman alat akan muncul di sini</div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /sec-dash-mhs -->
+
+    <!-- ======================================================
+         SECTION: DASHBOARD DOSEN (BARU)
+         ====================================================== -->
+    <div id="sec-dosen" class="hidden">
+      <div class="stat-grid" style="margin-bottom:20px;">
+        <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="bi bi-people"></i></div>
+          <div class="stat-value" id="dsnJumlahMhs">0</div><div class="stat-label">Mahasiswa Bimbingan</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-calendar-check"></i></div>
+          <div class="stat-value" id="dsnJumlahSesi">0</div><div class="stat-label">Total Sesi Bimbingan</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#fef3c7;color:#d97706;"><i class="bi bi-clock-history"></i></div>
+          <div class="stat-value" id="dsnTotalDurasi">0 menit</div><div class="stat-label">Total Durasi Bimbingan</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="stat-value" id="dsnKendalaAktif">0</div><div class="stat-label">Kendala Belum Selesai</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+          <h3>Mahasiswa Bimbingan</h3>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>NIM</th><th>Nama</th><th>Judul Penelitian</th><th>Sisa Waktu</th><th>Jumlah Sesi</th><th>Total Durasi</th><th>Kendala Aktif</th><th></th></tr></thead>
+          <tbody id="dsnMhsBody"><tr><td colspan="8"><div class="empty-state"><div class="empty-state-title">Memuat data...</div></div></td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+          <h3>Kendala Aktif</h3>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>Tanggal</th><th>Mahasiswa</th><th>Kendala</th><th>Aksi</th></tr></thead>
+          <tbody id="dsnKendalaBody"><tr><td colspan="4"><div class="empty-state"><div class="empty-state-title">Tidak ada kendala aktif</div></div></td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+          <h3>Catat Sesi Bimbingan</h3>
+        </div>
+        <div class="form-grid">
+          <div><label class="form-label">Mahasiswa</label>
+            <select id="dsnFormNim" class="form-control"></select></div>
+          <div><label class="form-label">Tanggal</label>
+            <input type="date" id="dsnFormTanggal" class="form-control"></div>
+          <div><label class="form-label">Durasi (menit)</label>
+            <input type="number" id="dsnFormDurasi" class="form-control" placeholder="60"></div>
+          <div><label class="form-label">Topik / Catatan</label>
+            <input type="text" id="dsnFormTopik" class="form-control" placeholder="Pembahasan bab 3, dst."></div>
+          <div style="grid-column:1/-1;"><label class="form-label">Kendala (kosongkan jika tidak ada)</label>
+            <textarea id="dsnFormKendala" class="form-control" rows="2" placeholder="Mis: kesulitan analisis data, alat rusak, dll."></textarea></div>
+        </div>
+        <button class="btn btn-primary" onclick="submitBimbinganLog()"><i class="bi bi-save"></i> Simpan Sesi Bimbingan</button>
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <div class="card-header"><h3>Riwayat Semua Sesi</h3></div>
+        <table class="tbl">
+          <thead><tr><th>Tanggal</th><th>Mahasiswa</th><th>Durasi</th><th>Topik</th><th>Kendala</th><th>Status</th></tr></thead>
+          <tbody id="dsnRiwayatBody"><tr><td colspan="6"><div class="empty-state"><div class="empty-state-title">Belum ada riwayat</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div><!-- /sec-dosen -->
+
+    <!-- ======================================================
+         SECTION: INVENTARIS
+         ====================================================== -->
+    <div id="sec-inv" class="hidden">
+      <div class="card">
+        <div class="card-title">Inventaris Laboratorium</div>
+        <div class="tab-nav">
+          <button class="tab-btn active" id="it-bahan" onclick="switchInvTab('bahan')"><i class="bi bi-droplet-half"></i> Bahan Kimia</button>
+          <button class="tab-btn" id="it-alat" onclick="switchInvTab('alat')"><i class="bi bi-tools"></i> Alat &amp; Instrumen</button>
+        </div>
+        <div id="ip-bahan">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div class="search-wrap" style="width:300px;"><i class="bi bi-search"></i><input type="text" id="srchChem" placeholder="Cari nama atau rumus kimia..." oninput="filterChem()"></div>
+            <div id="btnAddBahanWrap" class="hidden"><button class="btn btn-primary btn-sm" onclick="openModalAddBahan()"><i class="bi bi-plus-circle"></i> Tambah Bahan</button></div>
+          </div>
+          <div class="tbl-wrap" id="tbBahan-wrap">
+            <table class="tbl" style="table-layout:fixed;">
+              <thead><tr></tr></thead>
+              <tbody id="tbBahan"><tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">🧪</div><div class="empty-state-title">Memuat data bahan...</div></div></td></tr></tbody>
+            </table>
+          </div>
+          <div id="pgBahanWrap" class="pagination-wrap hidden"><div class="pagination-info" id="pgBahanInfo"></div><div class="pagination-btns" id="pgBahanBtns"></div></div>
+        </div>
+        <div id="ip-alat" class="hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div class="search-wrap" style="width:300px;"><i class="bi bi-search"></i><input type="text" id="srchAlat" placeholder="Cari nama alat atau kategori..." oninput="filterAlat()"></div>
+            <div id="btnAddAlatWrap" class="hidden"><button class="btn btn-success btn-sm" onclick="openModalAddAlat()"><i class="bi bi-plus-circle"></i> Tambah Alat</button></div>
+          </div>
+          <div class="tbl-wrap" id="tbAlat-wrap">
+            <table class="tbl" style="table-layout:fixed;">
+              <thead><tr></tr></thead>
+              <tbody id="tbAlat"><tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">🔧</div><div class="empty-state-title">Memuat data alat...</div></div></td></tr></tbody>
+            </table>
+          </div>
+          <div id="pgAlatWrap" class="pagination-wrap hidden"><div class="pagination-info" id="pgAlatInfo"></div><div class="pagination-btns" id="pgAlatBtns"></div></div>
+        </div>
+      </div>
+    </div><!-- /sec-inv -->
+
+    <!-- ======================================================
+         SECTION: PERMINTAAN & PENGEMBALIAN (Mahasiswa)
+         ====================================================== -->
+    <div id="sec-req" class="hidden">
+  <div id="rp-req">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title"><i class="bi bi-droplet-half" style="color:var(--primary);margin-right:8px;"></i>Minta Bahan Kimia</div>
+        <div style="margin-bottom:12px;"><label class="form-label">Pilih Bahan <span style="color:var(--danger);">*</span></label><div style="position:relative;"><input type="text" id="reqBahanSearch" class="form-control" placeholder="Ketik nama atau rumus kimia..."  autocomplete="off" oninput="filterReqBahanSearch()" onfocus="showReqBahanDropdown()" onblur="setTimeout(hideReqBahanDropdown, 200)"><div id="reqBahanDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:50;max-height:220px;overflow-y:auto;"></div><input type="hidden" id="reqBahanNama"></div></div>
+        <div style="margin-bottom:12px;"><label class="form-label">Jumlah <span style="color:var(--danger);">*</span></label><div style="display:flex;gap:8px;align-items:center;"><input type="number" id="reqBahanQty" class="form-control" placeholder="0" min="0.01" step="any"><span id="reqBahanSatuan" style="white-space:nowrap;color:var(--muted);font-size:13px;font-weight:600;min-width:30px;">—</span></div></div>
+        <div id="reqBahanInfo" style="font-size:12.5px;color:var(--muted);padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;">Pilih bahan untuk melihat stok &amp; harga</div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="submitBahanReq()"><i class="bi bi-check-circle"></i> Ajukan Permintaan Bahan</button>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title"><i class="bi bi-tools" style="color:var(--success);margin-right:8px;"></i>Pinjam Alat Laboratorium</div>
+        <div style="margin-bottom:12px;"><label class="form-label">Pilih Alat <span style="color:var(--danger);">*</span></label><div style="position:relative;"><input type="text" id="reqAlatSearch" class="form-control" placeholder="Ketik nama alat..." autocomplete="off" oninput="filterReqAlatSearch()" onfocus="showReqAlatDropdown()" onblur="setTimeout(hideReqAlatDropdown, 200)"><div id="reqAlatDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:50;max-height:220px;overflow-y:auto;"></div><input type="hidden" id="reqAlatNama"></div></div>
+        <div style="margin-bottom:12px;"><label class="form-label">Jumlah <span style="color:var(--danger);">*</span></label><div style="display:flex;gap:8px;align-items:center;"><input type="number" id="reqAlatQty" class="form-control" placeholder="0" min="1"><span id="reqAlatSatuan" style="white-space:nowrap;color:var(--muted);font-size:13px;font-weight:600;min-width:30px;">—</span></div></div>
+        <div id="reqAlatInfo" style="font-size:12.5px;color:var(--muted);padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;">Pilih alat untuk melihat stok tersedia</div>
+        <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="submitAlatReq()"><i class="bi bi-check-circle"></i> Ajukan Peminjaman Alat</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Riwayat Permintaan Saya</div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Tanggal</th><th>Item</th><th>Jumlah</th><th>Tipe</th><th>Status</th></tr></thead>
+          <tbody id="reqHistBody"><tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">Belum ada aktivitas</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="rp-ret" class="hidden">
+    <div class="card" style="margin-bottom:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="card-title" style="margin-bottom:0;"><i class="bi bi-tools" style="color:var(--success);margin-right:8px;"></i>Alat yang Sedang Dipinjam</div>
+        <button class="btn btn-sm btn-outline" onclick="loadMhsActiveLoans()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+      </div>
+      <div id="activeLoansDisplay"><div class="skeleton" style="height:60px;border-radius:10px;"></div></div>
+    </div>
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card-title"><i class="bi bi-arrow-return-left" style="color:var(--success);margin-right:8px;"></i>Ajukan Pengembalian Alat</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div><label class="form-label">Pilih Alat <span style="color:var(--danger);">*</span></label><select id="retAlatNama" class="form-select" onchange="fillReturnAlatInfo()"><option value="">— Pilih alat yang dipinjam —</option></select></div>
+        <div><label class="form-label">Jumlah Dikembalikan <span style="color:var(--danger);">*</span></label><input type="number" id="retJumlah" class="form-control" placeholder="0" min="1"></div>
+        <div><label class="form-label">Kondisi Alat</label><select id="retKondisi" class="form-select"><option value="Baik">Baik</option><option value="Perlu Servis">Perlu Servis</option><option value="Rusak Ringan">Rusak Ringan</option><option value="Rusak Berat">Rusak Berat</option></select></div>
+        <div><label class="form-label">Catatan kondisi / keterangan tambahan</label><input type="text" id="retCatatan" class="form-control" placeholder="Keterangan kondisi atau catatan khusus..."></div>
+      </div>
+      <div id="retAlatInfo" style="font-size:12.5px;color:var(--muted);padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;">Pilih alat untuk mengajukan pengembalian</div>
+      <button class="btn btn-success" onclick="submitReturnReq()"><i class="bi bi-send-check"></i> Ajukan Pengembalian</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Riwayat Pengajuan Pengembalian</div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Tanggal</th><th>Nama Alat</th><th>Jumlah</th><th>Kondisi</th><th>Status</th></tr></thead>
+          <tbody id="retHistBody"><tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">🔄</div><div class="empty-state-title">Belum ada pengajuan</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div><!-- /sec-req -->
+
+    <!-- ======================================================
+         SECTION: TAGIHAN BAHAN
+         ====================================================== -->
+    <div id="sec-pay" class="hidden">
+      <div id="pay-mhs-view">
+        <div class="callout callout-warning" style="margin-bottom:18px;">
+          <div class="callout-icon">💡</div>
+          <div>
+            <div class="callout-title" style="color:#92400e;">Syarat Bebas Lab</div>
+            <div class="callout-body" style="color:#78350f;"><strong>(1)</strong> Kembalikan semua alat &amp; konfirmasi diterima admin &nbsp;→&nbsp; <strong>(2)</strong> Ajukan rekapitulasi tagihan bahan di bawah &nbsp;→&nbsp; <strong>(3)</strong> Tunggu admin konfirmasi tagihan sebagai lunas &nbsp;→&nbsp; <strong>(4)</strong> Admin setujui bebas lab</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-title"><i class="bi bi-clipboard2-check" style="color:var(--primary);margin-right:8px;"></i>Status Syarat Bebas Lab</div>
+          <div id="bebasLabStatusBody"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;"><div class="skeleton" style="height:68px;border-radius:10px;"></div><div class="skeleton" style="height:68px;border-radius:10px;"></div><div class="skeleton" style="height:68px;border-radius:10px;"></div></div></div>
+        </div>
+        <div class="card" style="margin-bottom:18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="card-title" style="margin-bottom:0;"><i class="bi bi-receipt" style="color:var(--warning);margin-right:8px;"></i>Rekapitulasi Tagihan Bahan Kimia</div>
+            <button class="btn btn-sm btn-outline" onclick="loadPaySummary()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+          </div>
+          <div id="paySummaryBody"><div class="skeleton" style="height:80px;border-radius:8px;"></div></div>
+          <div id="paySubmitWrap" class="hidden" style="margin-top:16px;">
+            <div style="margin-bottom:12px;"><label class="form-label">Catatan untuk Admin (opsional)</label><input type="text" id="payCatatan" class="form-control" placeholder="Keterangan pembayaran, metode transfer, dll."></div>
+            <button class="btn btn-warning" style="width:100%;justify-content:center;" onclick="submitPaymentReq()"><i class="bi bi-send"></i> Ajukan Tagihan ke Admin</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Riwayat Pengajuan Tagihan</div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>Tanggal</th><th>Total Biaya</th><th>Status</th><th>Disetujui Oleh</th><th>Tanggal Approve</th></tr></thead>
+              <tbody id="payHistBody"><tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">🧾</div><div class="empty-state-title">Belum ada pengajuan tagihan</div></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="pay-admin-view" class="hidden">
+        <div class="card" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="card-title" style="margin-bottom:0;"><i class="bi bi-receipt" style="color:var(--warning);margin-right:8px;"></i>Pengajuan Tagihan — Menunggu Konfirmasi</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-sm btn-outline" onclick="printKalibrasiBlangko()" title="Cetak grid pengukur (mm) di atas blangko fisik untuk kalibrasi posisi cetak"><i class="bi bi-rulers"></i> Cetak Kalibrasi</button>
+              <button class="btn btn-sm btn-outline" onclick="loadAdminPayRequests()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>Mahasiswa</th><th>Tanggal</th><th>Total Biaya</th><th>Catatan</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody id="tbPayReq"><tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">🧾</div><div class="empty-state-title">Tidak ada tagihan pending</div></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Semua Riwayat Tagihan</div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>Mahasiswa</th><th>Tanggal</th><th>Total</th><th>Status</th><th>Disetujui</th><th>Aksi</th></tr></thead>
+              <tbody id="tbPayAll"><tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-title">Belum ada riwayat tagihan</div></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /sec-pay -->
+
+    <!-- ======================================================
+         SECTION: PEMINJAMAN (Admin)
+         ====================================================== -->
+    <div id="sec-pem" class="hidden">
+      <div class="card" style="margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;"><i class="bi bi-arrow-return-left" style="color:var(--success);margin-right:8px;"></i>Pengajuan Pengembalian Alat</div>
+          <button class="btn btn-sm btn-outline" onclick="loadReturnRequestsAdmin()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Mahasiswa</th><th>Nama Alat</th><th>Jumlah</th><th>Kondisi</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+            <tbody id="tbReturnReq"><tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-title">Tidak ada pengajuan pending</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+          <div class="card-title" style="margin-bottom:0;">Data Peminjaman &amp; Bebas Laboratorium</div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div class="search-wrap" style="width:300px;"><i class="bi bi-search"></i><input type="text" id="srchPem" placeholder="Cari nama atau NIM mahasiswa..." oninput="filterPem()"></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th style="min-width:160px;">Mahasiswa</th><th style="min-width:220px;">Akumulasi Bahan &amp; Alat</th><th style="min-width:130px;">Status Alat</th><th style="min-width:120px;">Status Bon</th><th style="min-width:110px;">Bebas Lab</th><th style="min-width:260px;">Aksi</th></tr></thead>
+            <tbody id="tbPem"><tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">Memuat data mahasiswa...</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /sec-pem -->
+
+    <!-- ======================================================
+         SECTION: KELOLA USER
+         ====================================================== -->
+    <div id="sec-user" class="hidden">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div class="card-title" style="margin-bottom:0;">Kelola Pengguna Sistem</div>
+          <button class="btn btn-primary btn-sm" onclick="openModalAddUser()"><i class="bi bi-person-plus"></i> Tambah User</button>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div class="search-wrap" style="width:280px;"><i class="bi bi-search"></i><input type="text" id="srchUser" placeholder="Cari nama atau username..." oninput="filterUsers()"></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Username / NIM</th><th>Nama Lengkap</th><th>Role</th><th>Aksi</th></tr></thead>
+            <tbody id="tbUser"><tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">👤</div><div class="empty-state-title">Memuat data user...</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /sec-user -->
+
+    <!-- ======================================================
+         SECTION: EXPORT LAPORAN
+         ====================================================== -->
+    <div id="sec-export" class="hidden">
+      <div class="card">
+        <div class="card-title">Export Laporan</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Pilih jenis laporan yang ingin diunduh dalam format Excel atau PDF.</p>
+        <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">Data Inventaris</div>
+        <div class="grid-3" style="margin-bottom:20px;">
+          <div class="export-card" onclick="triggerExport('inventaris_bahan')"><i class="bi bi-droplet-half" style="font-size:28px;color:var(--primary);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Inventaris Bahan</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Stok, status, lokasi, harga</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+          <div class="export-card" onclick="triggerExport('inventaris_alat')"><i class="bi bi-tools" style="font-size:28px;color:var(--success);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Inventaris Alat</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Jumlah, kondisi, kategori</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+          <div class="export-card" onclick="triggerExport('peminjaman')"><i class="bi bi-clipboard-check" style="font-size:28px;color:var(--warning);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Rekap Peminjaman</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Status &amp; bebas lab</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+        </div>
+        <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">Riwayat &amp; Log</div>
+        <div class="grid-3">
+          <div class="export-card" onclick="triggerExport('history_bahan')"><i class="bi bi-journal-text" style="font-size:28px;color:var(--primary);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Riwayat Bahan</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Log semua transaksi bahan</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+          <div class="export-card" onclick="triggerExport('history_alat')"><i class="bi bi-journal-check" style="font-size:28px;color:var(--success);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Riwayat Alat</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Log pinjam &amp; kembali</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+          <div class="export-card" onclick="triggerExport('payment')"><i class="bi bi-receipt" style="font-size:28px;color:var(--warning);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Rekap Tagihan</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Pembayaran bahan kimia</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+          <div class="export-card" onclick="triggerExport('audit_log')"><i class="bi bi-shield-check" style="font-size:28px;color:#7c3aed;display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Audit Log</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Semua aktivitas sistem</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+          <div class="export-card" onclick="triggerExport('maintenance')"><i class="bi bi-wrench-adjustable" style="font-size:28px;color:var(--warning);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Log Maintenance</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Riwayat perawatan alat</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+          <div class="export-card" onclick="triggerExport('waste')"><i class="bi bi-trash3" style="font-size:28px;color:var(--danger);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Log Limbah</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Pengelolaan limbah lab</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+          <div class="export-card" onclick="triggerExport('survei_kepuasan')"><i class="bi bi-emoji-smile" style="font-size:28px;color:#7c3aed;display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Survei Kepuasan</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Rekap hasil survei kepuasan lab</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+        </div>
+      </div>
+    </div><!-- /sec-export -->
+
+    <!-- ======================================================
+         SECTION: AUDIT LOG
+         ====================================================== -->
+    <div id="sec-audit" class="hidden">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <div class="card-title" style="margin-bottom:0;"><i class="bi bi-shield-check" style="color:var(--primary);margin-right:8px;"></i>Audit Log Sistem</div>
+          <div class="search-wrap" style="width:280px;"><i class="bi bi-search"></i><input type="text" id="srchAudit" placeholder="Cari aksi, user, target..." oninput="filterAudit()"></div>
+        </div>
+        <div class="tbl-wrap" style="max-height:560px;overflow-y:auto;">
+          <table class="tbl">
+            <thead><tr><th>Waktu</th><th>User</th><th>Aksi</th><th>Target</th><th>Perubahan</th></tr></thead>
+            <tbody id="tbAudit"><tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📜</div><div class="empty-state-title">Memuat log sistem...</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /sec-audit -->
+
+    <!-- ======================================================
+         SECTION: MAINTENANCE
+         ====================================================== -->
+    <div id="sec-maint" class="hidden">
+      <div class="card">
+        <div class="card-title"><i class="bi bi-wrench-adjustable" style="color:var(--warning);margin-right:8px;"></i>Catat Kegiatan Maintenance Alat</div>
+        <div class="section-form">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;">
+            <div><label class="form-label">Nama Alat <span style="color:var(--danger);">*</span></label><select id="mNamaAlat" class="form-select"><option value="">— Pilih alat —</option></select></div>
+            <div><label class="form-label">Tipe Kegiatan</label><select id="mTipe" class="form-select"><option>Pemeriksaan Rutin</option><option>Kalibrasi</option><option>Perbaikan</option><option>Pembersihan</option><option>Penggantian Komponen</option></select></div>
+            <div><label class="form-label">Kondisi Alat</label><select id="mKondisi" class="form-select"><option>Baik</option><option>Perlu Servis</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+            <div><label class="form-label">Tanggal Kegiatan <span style="color:var(--danger);">*</span></label><input type="date" id="mTanggal" class="form-control"></div>
+            <div><label class="form-label">Jadwal Berikutnya</label><input type="date" id="mTglBerikutnya" class="form-control"></div>
+            <div><label class="form-label">Teknisi / PIC</label><input type="text" id="mTeknisi" class="form-control" placeholder="Nama teknisi atau penanggung jawab"></div>
+            <div><label class="form-label">Catatan</label><input type="text" id="mCatatan" class="form-control" placeholder="Keterangan singkat..."></div>
+          </div>
+          <div style="margin-top:14px;"><button class="btn btn-primary" onclick="saveMaint()"><i class="bi bi-plus-circle"></i> Simpan Log Maintenance</button></div>
+        </div>
+        <div class="card-title" style="font-size:13.5px;margin-top:4px;">Riwayat Maintenance</div>
+        <div class="tbl-wrap" style="max-height:480px;overflow-y:auto;">
+          <table class="tbl">
+            <thead><tr><th>Nama Alat</th><th>Tipe</th><th>Tgl Kegiatan</th><th>Jadwal Berikutnya</th><th>Kondisi</th><th>Catatan</th></tr></thead>
+            <tbody id="tbMaint"><tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">🔧</div><div class="empty-state-title">Belum ada log maintenance</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /sec-maint -->
+
+    <!-- ======================================================
+         SECTION: LIMBAH
+         ====================================================== -->
+    <div id="sec-waste" class="hidden">
+      <div class="card">
+        <div class="card-title"><i class="bi bi-trash3" style="color:var(--danger);margin-right:8px;"></i>Pengelolaan Limbah Laboratorium</div>
+        <div class="section-form" style="background:#fff5f5;border-color:#fecaca;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+  <div>
+    <label class="form-label">Tanggal Pembuangan <span style="color:var(--danger);">*</span></label>
+    <input type="date" id="wTanggal" class="form-control">
+  </div>
+  <div>
+    <label class="form-label">Kategori Limbah <span style="color:var(--danger);">*</span></label>
+    <select id="wKategori" class="form-select">
+      <option value="">— Pilih kategori —</option>
+      <option>Larutan Asam</option>
+      <option>Larutan Basa</option>
+      <option>Larutan Organik</option>
+      <option>Botol Kosong</option>
+      <option>Pecahan Alat Gelas</option>
+      <option>Limbah Padat</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label">Jumlah <span style="color:var(--danger);">*</span></label>
+    <input type="number" id="wJumlah" class="form-control" placeholder="0" min="0.01" step="any">
+  </div>
+  <div>
+    <label class="form-label">Kemasan <span style="color:var(--danger);">*</span></label>
+    <select id="wKemasan" class="form-select">
+      <option value="">— Pilih kemasan —</option>
+      <option>Jrigen Biru 25 Liter</option>
+      <option>Jrigen Putih 25 Liter</option>
+      <option>Kardus</option>
+      <option>Karung</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label">Metode Pembuangan <span style="color:var(--danger);">*</span></label>
+    <select id="wMetode" class="form-select">
+      <option value="">— Pilih metode —</option>
+      <option>Netralisasi</option>
+      <option>Insinerasi</option>
+      <option>Penguburan</option>
+      <option>Dilusi &amp; Drainase</option>
+      <option>Diserahkan ke Pihak ke-3</option>
+      <option>Lainnya</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label">Catatan (opsional)</label>
+    <input type="text" id="wCatatan" class="form-control" placeholder="Keterangan tambahan tentang limbah ini...">
+  </div>
+</div>
+          <button class="btn btn-danger" onclick="saveWaste()"><i class="bi bi-trash3"></i> Catat Limbah</button>
+        </div>
+        <div class="card-title" style="font-size:13.5px;margin-top:4px;">Riwayat Log Limbah</div>
+        <div class="tbl-wrap" style="max-height:480px;overflow-y:auto;">
+          <table class="tbl">
+            <thead><tr><th>Tanggal</th><th>Kategori</th><th>Jumlah</th><th>Kemasan</th><th>Metode</th><th>Petugas</th><th>Catatan</th></tr></thead>
+            <tbody id="tbWaste"><tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">♻️</div><div class="empty-state-title">Belum ada log limbah</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /sec-waste -->
+ <!-- ============================================================
+     PATCH HTML — section #sec-survei
+      ============================================================ -->
+
+<div id="sec-survei" class="hidden">
+ 
+  <!-- ===== VIEW MAHASISWA: isi survei sendiri ===== -->
+  <div id="survei-mhs-view">
+    <div class="callout callout-info" style="margin-bottom:18px;">
+      <div class="callout-icon"><i class="bi bi-emoji-smile"></i></div>
+      <div>
+        <div class="callout-title" style="color:#1e40af;">Survei Kepuasan Pengguna Laboratorium</div>
+        <div class="callout-body" style="color:#1e40af;">Bantu kami meningkatkan layanan laboratorium dengan mengisi survei berikut. Skala: 1 = Kurang, 2 = Cukup, 3 = Puas, 4 = Sangat Puas. Survei dapat diisi 1 kali setiap 3 bulan (triwulan).</div>
+      </div>
+    </div>
+ 
+    <!-- Slot notifikasi: muncul jika mahasiswa sudah mengisi survei pada triwulan ini -->
+    <div id="svMhsTriwulanNotif" class="hidden" style="margin-bottom:18px;"></div>
+ 
+    <div class="card" id="svMhsFormCard">
+      <div class="card-title"><i class="bi bi-pencil-square" style="color:var(--primary);margin-right:8px;"></i>Isi Survei Kepuasan</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div><label class="form-label">Laboratorium <span style="color:var(--danger);">*</span></label><input type="text" id="svMhsLab" class="form-control" placeholder="cth: Lab. Kimia dan Biokimia Pangan" value="Laboratorium Kimia dan Biokimia Pangan dan Hasil Pertanian"></div>
+        <div><label class="form-label">Tanggal Pengisian <span style="color:var(--danger);">*</span></label><input type="date" id="svMhsTanggal" class="form-control"></div>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:16px;">
+        <table class="tbl">
+          <thead><tr><th style="width:40px;">No</th><th>Parameter</th><th style="text-align:center;width:260px;">Skala (1&ndash;4)</th></tr></thead>
+          <tbody id="svMhsParamBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-bottom:16px;"><label class="form-label">Catatan dan Saran (opsional)</label><textarea id="svMhsCatatan" class="form-control" rows="3" placeholder="Masukan atau saran Anda..."></textarea></div>
+      <button class="btn btn-primary" onclick="submitSurveiMhs()"><i class="bi bi-check-circle"></i> Kirim Survei</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Riwayat Survei Saya</div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Tanggal</th><th>Laboratorium</th><th>Rata-rata</th><th>Catatan</th></tr></thead>
+          <tbody id="tbSurveiMhs"><tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-title">Belum pernah mengisi survei</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== VIEW ADMIN: rekap periode + input + riwayat ===== -->
+  <div id="survei-admin-view" class="hidden">
+ 
+    <!-- Rekapitulasi per Periode (Triwulan / Tahunan) — SATU-SATUNYA
+         tampilan statistik & rata-rata skor sekarang. -->
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+        <div class="card-title" style="margin-bottom:0;">
+          <i class="bi bi-calendar3-range" style="color:#7c3aed;margin-right:8px;"></i>Rekapitulasi per Periode
+        </div>
+        <select id="svFilterPeriode" class="form-select" style="width:260px;" onchange="onChangeSurveiPeriode()">
+          <option value="ALL">Semua Periode (Keseluruhan)</option>
+        </select>
+      </div>
+      <div id="svRekapPeriodeBody">
+        <div class="skeleton" style="height:100px;border-radius:10px;"></div>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <div class="tab-nav" style="margin-bottom:18px;">
+        <button class="tab-btn active" id="svtab-single" onclick="switchSurveiInputTab('single')"><i class="bi bi-person"></i> Input per Responden</button>
+        <button class="tab-btn" id="svtab-rekap" onclick="switchSurveiInputTab('rekap')"><i class="bi bi-stack"></i> Input Rekap Manual</button>
+      </div>
+ 
+      <!-- Input satu-per-satu dari formulir fisik -->
+      <div id="svpane-single">
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:16px;">Input satu per satu dari formulir fisik yang diisi pengguna laboratorium.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div><label class="form-label">Laboratorium <span style="color:var(--danger);">*</span></label><input type="text" id="svLab" class="form-control" placeholder="cth: Lab. Kimia dan Biokimia Pangan" value="Laboratorium Kimia dan Biokimia Pangan dan Hasil Pertanian"></div>
+          <div><label class="form-label">Tanggal Pengisian <span style="color:var(--danger);">*</span></label><input type="date" id="svTanggal" class="form-control"></div>
+          <div><label class="form-label">Nama Pengisi / Responden</label><input type="text" id="svNama" class="form-control" placeholder="Opsional"></div>
+        </div>
+        <div class="tbl-wrap" style="margin-bottom:16px;">
+          <table class="tbl">
+            <thead><tr><th style="width:40px;">No</th><th>Parameter</th><th style="text-align:center;width:260px;">Skala (1&ndash;4)</th></tr></thead>
+            <tbody id="svParamBody"></tbody>
+          </table>
+        </div>
+        <div style="margin-bottom:16px;"><label class="form-label">Catatan dan Saran</label><textarea id="svCatatan" class="form-control" rows="3" placeholder="Catatan atau saran dari pengguna lab..."></textarea></div>
+        <button class="btn btn-primary" onclick="saveSurvei()"><i class="bi bi-check-circle"></i> Simpan Hasil Survei</button>
+      </div>
+ 
+      <!-- Input rekap manual: agregat banyak responden sekaligus -->
+      <div id="svpane-rekap" class="hidden">
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:16px;">Gunakan ini jika Anda hanya punya rekap/ringkasan (misalnya rata-rata dari sejumlah formulir fisik) tanpa perlu input satu per satu.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div><label class="form-label">Laboratorium <span style="color:var(--danger);">*</span></label><input type="text" id="rkLab" class="form-control" placeholder="cth: Lab. Kimia dan Biokimia Pangan" value="Laboratorium Kimia dan Biokimia Pangan dan Hasil Pertanian"></div>
+          <div><label class="form-label">Periode / Tanggal Rekap <span style="color:var(--danger);">*</span></label><input type="date" id="rkTanggal" class="form-control"></div>
+          <div><label class="form-label">Jumlah Responden <span style="color:var(--danger);">*</span></label><input type="number" id="rkJumlah" class="form-control" placeholder="cth: 20" min="1"></div>
+        </div>
+        <div class="tbl-wrap" style="margin-bottom:16px;">
+          <table class="tbl">
+            <thead><tr><th style="width:40px;">No</th><th>Parameter</th><th style="text-align:center;width:160px;">Rata-rata Skor (1&ndash;4)</th></tr></thead>
+            <tbody id="rkParamBody"></tbody>
+          </table>
+        </div>
+        <div style="margin-bottom:16px;"><label class="form-label">Catatan Rekap</label><textarea id="rkCatatan" class="form-control" rows="3" placeholder="cth: Rekap survei periode Jan-Mar 2026 dari 20 formulir fisik"></textarea></div>
+        <button class="btn btn-success" onclick="saveSurveiRekapManual()"><i class="bi bi-stack"></i> Simpan Rekap Manual</button>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div class="card-title" style="margin-bottom:0;">Riwayat Hasil Survei</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select id="filterSumberSurvei" class="form-select" style="width:170px;" onchange="filterSurvei()">
+            <option value="">Semua Sumber</option>
+            <option value="Mahasiswa">Mahasiswa</option>
+            <option value="Admin">Admin (Manual/Rekap)</option>
+          </select>
+          <div class="search-wrap" style="width:240px;"><i class="bi bi-search"></i><input type="text" id="srchSurvei" placeholder="Cari laboratorium, nama, catatan..." oninput="filterSurvei()"></div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Tanggal</th><th>Laboratorium</th><th>Sumber</th><th>Responden</th><th>Rata-rata</th><th>Catatan</th><th>Aksi</th></tr></thead>
+          <tbody id="tbSurvei"><tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-title">Memuat data survei...</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+</div><!-- /sec-survei -->
+    
+    <!-- ======================================================
+     SECTION: DETAIL MAHASISWA (Admin)
+     ====================================================== -->
+<div id="sec-student-detail" class="hidden">
+ 
+  <!-- ── Toolbar atas ──────────────────────────────────── -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+ 
+    <!-- Kiri: tombol kembali -->
+    <button class="btn btn-outline" onclick="goTo('dash')" style="display:flex;align-items:center;gap:6px;">
+      <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
+    </button>
+ 
+    <!-- Kanan: tombol aksi -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-sm btn-outline" onclick="editStudentDetail()" title="Edit data mahasiswa">
+        <i class="bi bi-pencil-square"></i> Edit
+      </button>
+      <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:1.5px solid #fecaca;"
+              onclick="deleteStudentDetail()" title="Hapus data mahasiswa">
+        <i class="bi bi-trash3"></i> Hapus
+      </button>
+ 
+      <!-- Dropdown cetak -->
+      <div style="position:relative;" id="printDropdownWrap">
+        <button class="btn btn-sm btn-primary"
+                onclick="document.getElementById('printMenu').classList.toggle('hidden')"
+                id="printDropdownBtn">
+          <i class="bi bi-printer"></i> Cetak ▾
+        </button>
+        <div id="printMenu" class="hidden"
+             style="position:absolute;right:0;top:calc(100% + 6px);background:#fff;
+                    border:1.5px solid var(--border);border-radius:10px;
+                    box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:200;
+                    min-width:230px;overflow:hidden;">
+          <button onclick="printStudentIdentitas();document.getElementById('printMenu').classList.add('hidden')"
+                  style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;
+                         background:none;border:none;cursor:pointer;font-size:13px;text-align:left;
+                         border-bottom:1px solid var(--border);"
+                  onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">
+            <i class="bi bi-person-badge" style="color:var(--primary);font-size:15px;"></i>
+            Cetak Identitas
+          </button>
+          <button onclick="printStudentBon();document.getElementById('printMenu').classList.add('hidden')"
+                  style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;
+                         background:none;border:none;cursor:pointer;font-size:13px;text-align:left;
+                         border-bottom:1px solid var(--border);"
+                  onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">
+            <i class="bi bi-droplet-half" style="color:var(--primary);font-size:15px;"></i>
+            Cetak Riwayat Bon Bahan
+          </button>
+          <button onclick="printStudentPem();document.getElementById('printMenu').classList.add('hidden')"
+                  style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;
+                         background:none;border:none;cursor:pointer;font-size:13px;text-align:left;
+                         border-bottom:1px solid var(--border);"
+                  onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">
+            <i class="bi bi-tools" style="color:var(--success);font-size:15px;"></i>
+            Cetak Riwayat Peminjaman
+          </button>
+          <button onclick="printStudentFull();document.getElementById('printMenu').classList.add('hidden')"
+                  style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;
+                         background:none;border:none;cursor:pointer;font-size:13px;text-align:left;"
+                  onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">
+            <i class="bi bi-file-earmark-person" style="color:#7c3aed;font-size:15px;"></i>
+            <strong>Laporan Lengkap</strong>
+          </button>
+        </div>
+      </div><!-- /printDropdownWrap -->
+    </div>
+  </div>
+ 
+  <!-- ── Kartu konten utama ─────────────────────────────── -->
+  <div class="card">
+ 
+    <!-- Tab navigation -->
+    <div class="tab-nav" style="margin-bottom:20px;">
+      <button class="tab-btn active" id="dtab-identitas" onclick="switchDetailTab('identitas')">
+        <i class="bi bi-person-badge"></i> Identitas
+      </button>
+      <button class="tab-btn" id="dtab-bon" onclick="switchDetailTab('bon')">
+        <i class="bi bi-droplet-half"></i> Riwayat Bon Bahan
+      </button>
+      <button class="tab-btn" id="dtab-pem" onclick="switchDetailTab('pem')">
+        <i class="bi bi-tools"></i> Riwayat Peminjaman
+      </button>
+    </div>
+ 
+    <!-- ── PANE: Identitas ──────────────────────────────── -->
+    <div id="dpane-identitas">
+      <div id="detailIdentitasContent">
+        <!-- Diisi oleh _renderDetailIdentitas() di dashboard.js -->
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="skeleton" style="height:32px;width:50%;border-radius:8px;"></div>
+          <div class="skeleton" style="height:20px;width:35%;border-radius:8px;"></div>
+          <div class="skeleton" style="height:100px;border-radius:10px;"></div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ── PANE: Riwayat Bon Bahan ──────────────────────── -->
+    <div id="dpane-bon" class="hidden">
+ 
+      <!-- Toolbar filter bon -->
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:14px;">
+        <div class="search-wrap" style="width:260px;">
+          <i class="bi bi-search"></i>
+          <input type="text" id="bonSearch" placeholder="Cari nama bahan, tipe, status..."
+                 oninput="filterDetailBon()">
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;margin-bottom:3px;">Dari Tanggal</label>
+          <input type="date" id="bonTglDari" class="form-control" style="width:140px;height:36px;"
+                 onchange="filterDetailBon()">
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;margin-bottom:3px;">Sampai Tanggal</label>
+          <input type="date" id="bonTglSampai" class="form-control" style="width:140px;height:36px;"
+                 onchange="filterDetailBon()">
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="
+            document.getElementById('bonSearch').value='';
+            document.getElementById('bonTglDari').value='';
+            document.getElementById('bonTglSampai').value='';
+            filterDetailBon();">
+          <i class="bi bi-x-circle"></i> Reset
+        </button>
+      </div>
+ 
+      <!-- Tabel bon — diisi oleh _renderDetailBon() -->
+      <div id="detailBonContent">
+        <div class="skeleton" style="height:120px;border-radius:8px;"></div>
+      </div>
+    </div>
+ 
+    <!-- ── PANE: Riwayat Peminjaman Alat ────────────────── -->
+    <div id="dpane-pem" class="hidden">
+ 
+      <!-- Toolbar filter peminjaman -->
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:14px;">
+        <div class="search-wrap" style="width:260px;">
+          <i class="bi bi-search"></i>
+          <input type="text" id="pemSearch" placeholder="Cari nama alat, kondisi, status..."
+                 oninput="filterDetailPem()">
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;margin-bottom:3px;">Dari Tanggal</label>
+          <input type="date" id="pemTglDari" class="form-control" style="width:140px;height:36px;"
+                 onchange="filterDetailPem()">
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;margin-bottom:3px;">Sampai Tanggal</label>
+          <input type="date" id="pemTglSampai" class="form-control" style="width:140px;height:36px;"
+                 onchange="filterDetailPem()">
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="
+            document.getElementById('pemSearch').value='';
+            document.getElementById('pemTglDari').value='';
+            document.getElementById('pemTglSampai').value='';
+            filterDetailPem();">
+          <i class="bi bi-x-circle"></i> Reset
+        </button>
+      </div>
+ 
+      <!-- Tabel peminjaman — diisi oleh _renderDetailPem() -->
+      <div id="detailPemContent">
+        <div class="skeleton" style="height:120px;border-radius:8px;"></div>
+      </div>
+    </div>
+ 
+  </div><!-- /card -->
+</div><!-- /sec-student-detail -->
+
+<div id="sec-mhs-ext" class="hidden">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div class="card-title" style="margin-bottom:0;">
+        <i class="bi bi-people" style="color:#7c3aed;margin-right:8px;"></i>Data Mahasiswa Laboratorium
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="search-wrap" style="width:260px;">
+          <i class="bi bi-search"></i>
+          <input type="text" id="srchMhsExt" placeholder="Cari nama, NIM, judul..." oninput="filterMhsExt()">
+        </div>
+        <select id="filterStatusMhsExt" class="form-select" style="width:120px;" onchange="filterMhsExt()">
+          <option value="">Semua Status</option>
+          <option value="Aktif">Aktif</option>
+          <option value="Lulus">Lulus</option>
+        </select>
+        <select id="filterTahunMhsExt" class="form-select" style="width:110px;" onchange="filterMhsExt()">
+          <option value="">Semua Tahun</option>
+        </select>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead id="theadMhsExt"></thead>
+        <tbody id="tbMhsExt">
+          <tr><td colspan="9">
+            <div class="empty-state">
+              <div class="empty-state-icon">👥</div>
+              <div class="empty-state-title">Memuat data...</div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="pgMhsExtWrap" class="pagination-wrap hidden">
+      <div class="pagination-info" id="pgMhsExtInfo"></div>
+      <div class="pagination-btns" id="pgMhsExtBtns"></div>
+    </div>
+  </div>
+</div>
+    
+  </div><!-- /mainContent -->
+
+  <!-- ============================================================
+       MODALS
+       ============================================================ -->
+  <div id="mdlAllStudents" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlAllStudents')">
+    <div class="modal-box modal-w-xl">
+      <div class="modal-head"><h5><i class="bi bi-mortarboard" style="color:var(--primary);margin-right:8px;"></i>Seluruh Mahasiswa Aktif</h5><button class="modal-close" onclick="closeModal('mdlAllStudents')"><i class="bi bi-x-lg"></i></button></div>
+      <div style="margin-bottom:12px;"><div class="search-wrap"><i class="bi bi-search"></i><input type="text" id="srchStudentModal" placeholder="Cari NIM atau nama mahasiswa..." oninput="filterStudentModal()"></div></div>
+      <div class="tbl-wrap" style="max-height:500px;overflow-y:auto;">
+        <table class="tbl"><thead><tr><th>NIM</th><th>Nama</th><th>Dosen Pembimbing</th><th>Judul Penelitian</th><th>Periode</th><th>Sisa Waktu</th><th>Status</th></tr></thead><tbody id="tbAllStudentsBody"><tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">Memuat data...</div></div></td></tr></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div id="mdlPayDetail" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlPayDetail')">
+    <div class="modal-box modal-w-lg"><div class="modal-head"><h5><i class="bi bi-receipt" style="color:var(--warning);margin-right:8px;"></i>Detail Tagihan Bahan Kimia</h5><button class="modal-close" onclick="closeModal('mdlPayDetail')"><i class="bi bi-x-lg"></i></button></div><div id="mdlPayDetailBody"></div></div>
+  </div>
+
+  <div id="mdlDetail" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlDetail')">
+    <div class="modal-box modal-w-lg"><div class="modal-head"><h5>Detail Peminjaman &amp; Identitas Mahasiswa</h5><button class="modal-close" onclick="closeModal('mdlDetail')"><i class="bi bi-x-lg"></i></button></div><div id="mdlDetailBody"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">Memuat...</div></div></div></div>
+  </div>
+
+  <div id="mdlStok" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlStok')">
+    <div class="modal-box modal-w-md">
+      <div class="modal-head"><h5 id="mdlStokTitle">Update Stok</h5><button class="modal-close" onclick="closeModal('mdlStok')"><i class="bi bi-x-lg"></i></button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+        <div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Nama</div><div style="font-weight:700;font-size:14px;" id="mdlStokNama">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Rumus / Spek</div><div style="font-weight:700;" id="mdlStokRumus">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Kategori / Kondisi</div><div id="mdlStokKat">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Lokasi</div><div id="mdlStokLok">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Stok Sekarang</div><div style="font-weight:700;font-size:16px;font-family:'Inter',sans-serif;color:var(--primary);" id="mdlStokVal">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Status</div><div id="mdlStokStatus">—</div></div>
+      </div>
+
+      <!-- ── Toggle Tambah / Kurangi Stok (diisi oleh _renderStokToggle() di inventaris.js) ── -->
+      <div id="mdlStokToggle" style="margin-bottom:14px;"></div>
+
+      <div id="mdlKategoriWrap" class="hidden" style="margin-bottom:14px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);">
+        <label class="form-label">Kategori Alat</label>
+        <select id="mdlKategoriAlat" class="form-select" style="margin-bottom:8px;"><option value="">— Pilih kategori —</option><option value="Kategori 1">Kategori 1</option><option value="Kategori 2">Kategori 2</option><option value="Kategori 3">Kategori 3</option></select>
+        <button class="btn btn-outline btn-sm" onclick="saveKategoriAlat()"><i class="bi bi-tag"></i> Simpan Kategori</button>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid var(--border);">
+        <label class="form-label" id="mdlStokInputLabel">Jumlah Penambahan</label>
+        <div style="display:flex;gap:8px;"><input type="number" id="mdlStokInput" class="form-control" placeholder="Masukkan jumlah yang ditambahkan..." min="1"><button class="btn btn-primary" id="mdlStokBtn"><i class="bi bi-plus-circle"></i> Tambah</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mdlAddBahan" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlAddBahan')">
+    <div class="modal-box modal-w-lg">
+      <div class="modal-head"><h5><i class="bi bi-droplet-half" style="color:var(--primary);margin-right:8px;"></i>Tambah Bahan Kimia Baru</h5><button class="modal-close" onclick="closeModal('mdlAddBahan')"><i class="bi bi-x-lg"></i></button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label class="form-label">Nama Bahan <span style="color:var(--danger);">*</span></label><input type="text" id="abNama" class="form-control" placeholder="cth: Natrium Klorida"></div>
+        <div><label class="form-label">Rumus Kimia</label><input type="text" id="abRumus" class="form-control" placeholder="cth: NaCl"></div>
+        <div><label class="form-label">Kategori</label><input type="text" id="abKategori" class="form-control" placeholder="cth: Garam, Asam, Basa"></div>
+        <div><label class="form-label">Lokasi Penyimpanan</label><input type="text" id="abLokasi" class="form-control" placeholder="cth: Lemari A Rak 2"></div>
+        <div><label class="form-label">Stok Awal <span style="color:var(--danger);">*</span></label><input type="number" id="abStok" class="form-control" placeholder="0" min="0" step="any"></div>
+        <div><label class="form-label">Stok Aman</label><input type="number" id="abStokAman" class="form-control" placeholder="0" min="0" step="any"></div>
+        <div><label class="form-label">Satuan <span style="color:var(--danger);">*</span></label><input type="text" id="abSatuan" class="form-control" placeholder="mL / g / L"></div>
+        <div><label class="form-label">Harga per Satuan (Rp)</label><input type="number" id="abHarga" class="form-control" placeholder="0" min="0"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:18px;"><button class="btn btn-primary" onclick="saveAddBahan()" style="flex:1;justify-content:center;"><i class="bi bi-plus-circle"></i> Simpan Bahan Baru</button><button class="btn btn-outline" onclick="closeModal('mdlAddBahan')">Batal</button></div>
+    </div>
+  </div>
+
+  <div id="mdlAddAlat" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlAddAlat')">
+    <div class="modal-box modal-w-lg">
+      <div class="modal-head"><h5><i class="bi bi-tools" style="color:var(--success);margin-right:8px;"></i>Tambah Alat Baru</h5><button class="modal-close" onclick="closeModal('mdlAddAlat')"><i class="bi bi-x-lg"></i></button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label class="form-label">Nama Alat <span style="color:var(--danger);">*</span></label><input type="text" id="aaAlatNama" class="form-control" placeholder="cth: Erlenmeyer 250mL"></div>
+        <div><label class="form-label">Spesifikasi</label><input type="text" id="aaSpek" class="form-control" placeholder="cth: Pyrex, borosilikat"></div>
+        <div><label class="form-label">Lokasi Penyimpanan</label><input type="text" id="aaLokasi" class="form-control" placeholder="cth: Lemari Alat B"></div>
+        <div><label class="form-label">Kondisi</label><select id="aaKondisi" class="form-select"><option>Baik</option><option>Perlu Servis</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></div>
+        <div><label class="form-label">Jumlah Awal <span style="color:var(--danger);">*</span></label><input type="number" id="aaStok" class="form-control" placeholder="0" min="0"></div>
+        <div><label class="form-label">Stok Aman</label><input type="number" id="aaStokAman" class="form-control" placeholder="0" min="0"></div>
+        <div><label class="form-label">Satuan</label><input type="text" id="aaSatuan" class="form-control" placeholder="pcs / set / unit" value="pcs"></div>
+        <div><label class="form-label">Kategori</label><select id="aaKategori" class="form-select"><option value="">— Pilih kategori —</option><option value="Kategori 1">Kategori 1</option><option value="Kategori 2">Kategori 2</option><option value="Kategori 3">Kategori 3</option></select></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:18px;"><button class="btn btn-success" onclick="saveAddAlat()" style="flex:1;justify-content:center;"><i class="bi bi-plus-circle"></i> Simpan Alat Baru</button><button class="btn btn-outline" onclick="closeModal('mdlAddAlat')">Batal</button></div>
+    </div>
+  </div>
+
+  <div id="mdlKembali" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlKembali')">
+    <div class="modal-box modal-w-md">
+      <div class="modal-head"><h5><i class="bi bi-arrow-return-left" style="color:var(--success);margin-right:8px;"></i>Proses Pengembalian Alat</h5><button class="modal-close" onclick="closeModal('mdlKembali')"><i class="bi bi-x-lg"></i></button></div>
+      <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;margin-bottom:16px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:3px;">Mahasiswa</div><span style="font-weight:700;" id="kbNamaMhs">—</span><span style="color:var(--muted);font-size:12px;margin-left:6px;" id="kbNimMhs"></span></div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#374151;">Pilih Alat yang Dikembalikan</div>
+      <div id="kbAlatList" style="margin-bottom:12px;"><div class="skeleton" style="height:48px;border-radius:8px;margin-bottom:6px;"></div><div class="skeleton" style="height:48px;border-radius:8px;"></div></div>
+      <div id="kbForm" class="hidden">
+        <div style="margin-bottom:10px;font-size:13px;"><span style="color:var(--muted);">Alat: </span><span style="font-weight:700;" id="kbSelectedNama">—</span><span style="color:var(--muted);font-size:12px;"> (dipinjam: <span id="kbSelectedJml">0</span>)</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div><label class="form-label">Jumlah Dikembalikan</label><input type="number" id="kbJumlah" class="form-control" placeholder="0" min="1"></div>
+          <div><label class="form-label">Kondisi</label><select id="kbKondisi" class="form-select"><option>Baik</option><option>Perlu Servis</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></div>
+        </div>
+        <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="saveKembali()"><i class="bi bi-check-lg"></i> Proses Pengembalian</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mdlUser" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlUser')">
+    <div class="modal-box modal-w-lg">
+      <div class="modal-head"><h5 id="mdlUserTitle">Tambah User Baru</h5><button class="modal-close" onclick="closeModal('mdlUser')"><i class="bi bi-x-lg"></i></button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div><label class="form-label">Username / NIM <span style="color:var(--danger);">*</span></label><input type="text" id="uUsername" class="form-control" placeholder="cth: 20230001"></div>
+        <div><label class="form-label">Nama Lengkap <span style="color:var(--danger);">*</span></label><input type="text" id="uNama" class="form-control" placeholder="Nama lengkap pengguna"></div>
+        <div><label class="form-label">Role <span style="color:var(--danger);">*</span></label><select id="uRole" class="form-select" onchange="toggleStudentFields()"><option value="Mahasiswa">Mahasiswa</option><option value="Admin">Admin</option><option value="Dosen">Dosen</option></select></div>
+        <div id="uPassWrap"><label class="form-label">Password <span style="color:var(--danger);">*</span></label><input type="text" id="uPass" class="form-control" placeholder="Password awal untuk login"></div>
+        <div id="uResetWrap" class="hidden"><label class="form-label">Password Baru</label><div style="display:flex;gap:6px;"><input type="text" id="uNewPass" class="form-control" placeholder="Kosongkan jika tidak diubah"><button class="btn btn-outline btn-sm" onclick="doResetPass()">Reset</button></div></div>
+      </div>
+      <div id="studentFields" class="hidden">
+        <div class="divider"></div>
+        <div style="font-weight:700;font-size:13.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="bi bi-mortarboard" style="color:var(--primary);"></i> Data Penelitian (Opsional)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label class="form-label">Dosen Pembimbing</label><input type="text" id="uDosen" class="form-control" placeholder="Nama dosen pembimbing"></div>
+          <div><label class="form-label">Judul Penelitian</label><input type="text" id="uJudul" class="form-control" placeholder="Judul skripsi/tesis/riset"></div>
+          <div><label class="form-label">Tanggal Mulai</label><input type="date" id="uTglMulai" class="form-control"></div>
+          <div><label class="form-label">Tanggal Selesai</label><input type="date" id="uTglSelesai" class="form-control"></div>
+          <div><label class="form-label">Status Mahasiswa</label><select id="uStatus" class="form-select"><option value="Aktif">Aktif</option><option value="Lulus">Lulus</option></select></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:18px;"><button class="btn btn-primary" onclick="doSaveUser()" style="flex:1;justify-content:center;"><i class="bi bi-check-circle"></i> Simpan</button><button class="btn btn-outline" onclick="closeModal('mdlUser')">Batal</button></div>
+    </div>
+  </div>
+
+  <div id="mdlExport" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlExport')">
+    <div class="modal-box modal-w-sm">
+      <div class="modal-head"><h5>Pilih Format Export</h5><button class="modal-close" onclick="closeModal('mdlExport')"><i class="bi bi-x-lg"></i></button></div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;" id="exportDesc">Unduh laporan sebagai:</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="btn btn-primary" style="justify-content:center;padding:12px;" onclick="doExport('excel')"><i class="bi bi-file-earmark-spreadsheet"></i> Excel (.xlsx)</button>
+        <button class="btn btn-danger" style="justify-content:center;padding:12px;" onclick="doExport('pdf')"><i class="bi bi-file-earmark-pdf"></i> PDF (Cetak / Download)</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mdlReq" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlReq')">
+    <div class="modal-box modal-w-md">
+      <div class="modal-head"><h5 id="mdlReqTitle">Ajukan Permintaan</h5><button class="modal-close" onclick="closeModal('mdlReq')"><i class="bi bi-x-lg"></i></button></div>
+      <div style="margin-bottom:12px;"><label class="form-label">Pilih Item <span style="color:var(--danger);">*</span></label><div style="position:relative;">
+        <input type="text" id="mdlReqSearch"
+          placeholder="Ketik nama atau rumus kimia..."
+          class="form-control"
+          autocomplete="off"
+          oninput="filterReqSearch()"
+          onfocus="showReqDropdown()"
+          onblur="setTimeout(hideReqDropdown, 200)"
+          style="border-radius:10px;">
+        <div id="mdlReqDropdown"
+          style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:9999;max-height:220px;overflow-y:auto;"></div>
+        <input type="hidden" id="mdlReqNama"></div>
+      </div>
+      <div style="margin-bottom:12px;"><label class="form-label">Jumlah <span style="color:var(--danger);">*</span></label><div style="display:flex;gap:8px;align-items:center;"><input type="number" id="mdlReqQty" class="form-control" placeholder="0" min="0.01" step="any"><span id="mdlReqSatuan" style="color:var(--muted);font-size:13px;font-weight:600;min-width:30px;white-space:nowrap;">—</span></div></div>
+      <div id="mdlReqInfo" style="font-size:12.5px;color:var(--muted);padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;">Pilih item untuk melihat stok &amp; info</div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" id="mdlReqBtn" onclick="doModalReq()"><i class="bi bi-check-circle"></i> Ajukan</button>
+    </div>
+  </div>
+
+  <!-- >>> SURVEI: modal detail survei dipindah keluar dari sidebar -->
+  <div id="mdlSurveiDetail" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlSurveiDetail')">
+    <div class="modal-box modal-w-lg">
+      <div class="modal-head">
+        <h5><i class="bi bi-emoji-smile" style="color:var(--primary);margin-right:8px;"></i>Detail Hasil Survei</h5>
+        <button class="modal-close" onclick="closeModal('mdlSurveiDetail')"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div id="mdlSurveiBody"></div>
+    </div>
+  </div>
+
+</div><!-- /appWrap -->
+
+<!-- ============================================================
+     JAVASCRIPT — urutan penting!
+     ============================================================ -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/inventaris.js"></script>
+<script src="js/permintaan.js"></script>
+<script src="js/tagihan.js"></script>
+<script src="js/peminjaman.js"></script>
+<script src="js/user.js"></script>
+<script src="js/export.js"></script>
+<script src="js/misc.js"></script>
+<script src="js/survei.js"></script><!-- >>> SURVEI: script dipindah ke urutan load utama -->
+<script src="js/dosen.js"></script><!-- >>> DOSEN: dashboard & log bimbingan role Dosen -->
+<script>
+// Tutup dropdown cetak saat klik di luar area dropdown
+document.addEventListener('click', function(e) {
+  var wrap = document.getElementById('printDropdownWrap');
+  var menu = document.getElementById('printMenu');
+  if (wrap && menu && !wrap.contains(e.target)) {
+    menu.classList.add('hidden');
+  }
+});
+</script>
+<div id="sidebarBackdrop" onclick="closeSidebar()"></div>
+</div>
+
+<!-- ============================================================
+     PWA — Registrasi Service Worker
+     ============================================================ -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function (err) {
+      console.error('SW registration failed:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>

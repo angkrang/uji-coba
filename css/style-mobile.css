@@ -1,0 +1,1143 @@
+/* ============================================================
+   STYLE-MOBILE.CSS — Tulis ulang bersih
+   Muat SETELAH style.css:
+     <link rel="stylesheet" href="css/style.css">
+     <link rel="stylesheet" href="css/style-mobile.css">
+   ============================================================ */
+
+/* ============================================================
+   0. GLOBAL RESET & BASE
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+@media (max-width: 768px) {
+  html, body {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+  }
+}
+
+
+/* ============================================================
+   1. CLASS CSS YANG HILANG DI STYLE.CSS
+      (dipakai di HTML tapi tidak didefinisikan)
+   ============================================================ */
+
+/* Header card dashboard */
+.db-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Icon stat mahasiswa */
+.db-stat-blue   { background: #dbeafe; color: #1e40af; }
+.db-stat-teal   { background: #ccfbf1; color: #0f766e; }
+.db-stat-green  { background: #dcfce7; color: #166534; }
+
+/* Icon aksi cepat */
+.db-action-blue { background: #dbeafe; color: #1e40af; }
+.db-action-teal { background: #ccfbf1; color: #0f766e; }
+
+/* Chevron aksi cepat */
+.db-action-arrow {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* Legend donut tracker */
+.db-donut-legend {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #64748b;
+  justify-content: center;
+}
+.db-legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 3px;
+  vertical-align: middle;
+}
+
+
+/* ============================================================
+   2. LOGIN PAGE — full-screen di HP
+   ============================================================ */
+
+@media (max-width: 480px) {
+  #loginPage {
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .login-card {
+    width: 100%;
+    min-height: 100dvh;
+    border-radius: 0;
+    padding: 32px 20px 48px;
+    box-shadow: none;
+    overflow-y: auto;
+  }
+}
+
+
+/* ============================================================
+   3. LAYOUT UTAMA — sidebar & mainContent
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* Sidebar: hidden via transform, BUKAN display:none */
+  #sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    z-index: 1200;
+    transform: translateX(-280px);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  #sidebar.open {
+    transform: translateX(0) !important;
+  }
+
+  /* Backdrop gelap saat sidebar terbuka */
+  #sidebarBackdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1199;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  #sidebarBackdrop.show {
+    display: block;
+  }
+
+  /* Sembunyikan topbar desktop */
+  .topbar {
+    display: none !important;
+  }
+
+  /* Main content */
+  #mainContent {
+    margin-left: 0 !important;
+    padding-top: 64px !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    height: auto !important;
+    min-height: 100dvh;
+    overflow-y: unset;
+     overflow-x: hidden;
+  }
+
+  #mainContent > *:not(#mobileTopbar) {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+/* ============================================================
+   4. MOBILE TOP BAR
+   ============================================================ */
+
+#mobileTopbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #mobileTopbar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    height: 56px;
+    background: #0a0f1e;
+    padding: 0 14px;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Sesuaikan padding-top mainContent dengan tinggi topbar baru */
+  #mainContent {
+    padding-top: 68px !important;
+  }
+}
+
+/* ============================================================
+   5. BOTTOM NAVIGATION — fixed di bawah
+   ============================================================ */
+
+/* Default: tersembunyi */
+/*#bottomNav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #bottomNav {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    background: #0a0f1e;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  #bottomNav .bn-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 64px;
+    padding: 0 4px;
+    gap: 0;
+  }
+
+  #bottomNav .bn-item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 0 4px;
+    height: 100%;
+    cursor: pointer;
+    color: #475569;
+    border: none;
+    background: none;
+    transition: color 0.18s;
+  }
+
+  #bottomNav .bn-item.active {
+    color: #60a5fa;
+  }
+
+  #bottomNav .bn-item i {
+    font-size: 20px;
+  }
+
+  #bottomNav .bn-item span {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Layar sangat sempit: sembunyikan label teks bottom nav */
+/*@media (max-width: 360px) {
+  #bottomNav .bn-item span {
+    display: none;
+  }
+  #bottomNav .bn-item i {
+    font-size: 22px;
+  }
+}*/
+
+
+/* ============================================================
+   6. CARD
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .card {
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 13.5px;
+    margin-bottom: 12px;
+  }
+}
+
+
+/* ============================================================
+   7. STAT CARDS (grid-5 di admin dashboard)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .grid-5 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .stat-val {
+    font-size: 22px;
+  }
+
+  .stat-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .grid-5 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* ============================================================
+   8. GRID UTILITIES
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr; }
+}
+
+
+/* ============================================================
+   9. OVERRIDE INLINE GRID YANG TIDAK RESPONSIF
+      (atribut style="display:grid;grid-template-columns:...")
+   ============================================================ */
+
+@media (max-width: 768px) {
+  [style*="grid-template-columns:repeat(5"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  [style*="grid-template-columns:repeat(4"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  [style*="grid-template-columns:repeat(3"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  /* 2 kolom simetris → stack */
+  [style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  /* Kolom asimetris (chart + kalibr, dll) → stack */
+  [style*="grid-template-columns:1fr 1.6fr"],
+  [style*="grid-template-columns:420px 1fr"],
+  [style*="grid-template-columns:320px 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  /* Form 3 atau 4 kolom → stack */
+  [style*="grid-template-columns:repeat(3,1fr)"],
+  [style*="grid-template-columns:repeat(4,1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  [style*="grid-template-columns:repeat(2"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   10. TABEL — horizontal scroll + font ringkas
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .tbl-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+  }
+
+  .tbl {
+    min-width: 480px;
+    table-layout: auto;
+  }
+
+  .tbl thead th {
+    font-size: 10px;
+    padding: 7px 8px;
+    white-space: nowrap;
+  }
+
+  .tbl tbody td {
+    font-size: 11.5px;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+
+  /* Kolom terakhir (aksi) boleh wrap */
+  .tbl td:last-child,
+  .tbl th:last-child {
+    white-space: normal;
+  }
+
+  /* Tombol di dalam sel tabel */
+  .tbl td .btn,
+  .tbl td .btn-sm {
+    padding: 4px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+}
+
+
+/* ============================================================
+   11. FORM ELEMENTS
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* font-size 16px mencegah auto-zoom di iOS */
+  .form-control,
+  .form-select {
+    font-size: 16px !important;
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .form-label {
+    font-size: 12px;
+  }
+
+  .search-wrap {
+    width: 100% !important;
+    border-radius: 12px;
+    padding: 8px 14px;
+  }
+
+  .search-wrap input {
+    font-size: 16px !important;
+  }
+}
+
+
+/* ============================================================
+   12. BUTTONS
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .btn {
+    min-height: 42px;
+    padding: 9px 16px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .btn-sm {
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .btn-xs {
+    min-height: 30px;
+    padding: 4px 9px;
+    font-size: 11px;
+  }
+
+  .tab-btn {
+    min-height: 38px;
+  }
+}
+
+
+/* ============================================================
+   13. MODAL — sheet dari bawah di HP
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92dvh !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 20px 16px 32px !important;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-head h5 {
+    font-size: 14.5px;
+  }
+
+  /* Grid 2 kolom di dalam modal → 1 kolom */
+  .modal-box [style*="grid-template-columns:1fr 1fr"],
+  .modal-box [style*="grid-template-columns: 1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+}
+
+
+/* ============================================================
+   14. TAB NAVIGATION — scroll horizontal
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .tab-nav {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    border-radius: 10px;
+    scrollbar-width: none;
+  }
+
+  .tab-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 7px 12px;
+  }
+}
+
+
+/* ============================================================
+   15. PAGINATION
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .pagination-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pagination-btns {
+    flex-wrap: wrap;
+  }
+
+  .pg-btn {
+    min-width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+}
+
+
+/* ============================================================
+   16. CALLOUT / ALERT
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .callout {
+    padding: 12px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .callout-body {
+    font-size: 12px;
+  }
+
+  #onboardingCallout {
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+}
+
+
+/* ============================================================
+   17. CHART
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .chart-wrap {
+    height: 200px;
+  }
+}
+
+
+/* ============================================================
+   18. EXPORT CARDS
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .export-card {
+    padding: 16px 12px;
+  }
+
+  .export-card i {
+    font-size: 22px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ============================================================
+   19. INVENTARIS — filter dropdown
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .inv-filter-drop {
+    position: fixed !important;
+    left: 14px !important;
+    right: 14px !important;
+    transform: none !important;
+    width: auto !important;
+  }
+}
+
+
+/* ============================================================
+   20. PRINT DROPDOWN
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #printMenu {
+    right: 0 !important;
+    left: auto !important;
+    min-width: 200px !important;
+  }
+}
+
+
+/* ============================================================
+   21. DASHBOARD MAHASISWA
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* ── Row 1: Profile + Stats ── */
+  .db-top-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  /* Profile card: horizontal kompak */
+  .db-profile-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+
+  .db-profile-card::before,
+  .db-profile-card::after {
+    display: none;
+  }
+
+  .db-prof-avatar {
+    width: 42px;
+    height: 42px;
+    font-size: 15px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .db-prof-name {
+    font-size: 14px;
+    margin-bottom: 1px;
+  }
+
+  .db-prof-nim {
+    font-size: 11px;
+    margin-bottom: 0;
+  }
+
+  /* Sembunyikan baris detail profil di mobile */
+  #mhsProfileRows {
+    display: none;
+  }
+
+  /* Stat cards: 3 kolom tetap */
+  .db-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .db-stat-card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .db-stat-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .db-stat-value {
+    font-size: 18px;
+  }
+
+  .db-stat-label {
+    font-size: 10px;
+  }
+
+  .db-stat-pill {
+    font-size: 9px;
+    padding: 1px 6px;
+  }
+
+  /* ── Row 2: Aksi / Bebas Lab / Tracker ── */
+  .db-mid-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  /* Cards dalam mid row */
+  .db-card {
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 0;
+  }
+
+  .db-card-title {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .db-action-item {
+    padding: 9px 10px;
+    margin-bottom: 7px;
+    border-radius: 10px;
+  }
+
+  .db-action-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .db-action-text p {
+    font-size: 12px;
+  }
+
+  .db-action-text span {
+    font-size: 10px;
+  }
+
+  /* Time tracker: horizontal */
+  .db-tracker-card {
+    padding: 12px 14px;
+  }
+
+  .db-tracker-body {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .db-donut-wrap {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .db-donut-wrap svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  .db-tracker-stats {
+    flex: 1;
+  }
+
+  .db-tracker-stat {
+    padding: 4px 0;
+  }
+
+  .db-tstat-label {
+    font-size: 10px;
+  }
+
+  .db-tstat-value {
+    font-size: 11px;
+  }
+}
+
+/* Layar sangat kecil: tracker stack vertikal */
+@media (max-width: 400px) {
+  .db-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .db-stat-value {
+    font-size: 16px;
+  }
+
+  .db-tracker-body {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .db-donut-wrap svg {
+    width: 90px;
+    height: 90px;
+  }
+
+  .db-tracker-stats {
+    width: 100%;
+  }
+
+  .db-prof-name {
+    font-size: 13px;
+  }
+}
+
+
+/* ============================================================
+   22. DASHBOARD ADMIN
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* Identity card mahasiswa: 2 kolom grid */
+  #adminStudentList {
+    overflow-x: hidden;
+  }
+
+  #adminStudentList > div > div:first-child {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    flex-wrap: unset !important;
+  }
+
+  .identity-card {
+    max-width: 100% !important;
+    flex: none !important;
+    min-width: 0 !important;
+  }
+
+  /* Skeleton di stat cards */
+  #sec-dash-admin [style*="display:flex;gap:10px"] .skeleton {
+    height: 80px !important;
+  }
+}
+
+
+/* ============================================================
+   23. PERMINTAAN & PENGEMBALIAN (sec-req)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* 2 kartu minta/pinjam → full width stack */
+  #rp-req > div[style*="grid-template-columns:1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* Form 2 kolom di dalam tab ret → stack */
+  #rp-ret [style*="grid-template-columns:1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+}
+
+
+/* ============================================================
+   24. PEMINJAMAN ADMIN (tbPem) — tombol aksi
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #tbPem td:last-child {
+    white-space: normal !important;
+  }
+
+  #tbPem td:last-child .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 4px;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+
+/* ============================================================
+   25. REKAP TAGIHAN (sec-pay)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #sec-pay [style*="grid-template-columns:1fr 1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+}
+
+
+/* ============================================================
+   26. BEBAS LAB
+   ============================================================ */
+
+@media (max-width: 560px) {
+  #bebasLabBannerBody [style*="grid-template-columns:1fr 1fr 1fr"],
+  #bebasLabStatusBody [style*="grid-template-columns:1fr 1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+}
+
+
+/* ============================================================
+   27. MAINTENANCE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #sec-maint .section-form [style*="grid-template-columns:repeat(3,1fr)"],
+  #sec-maint .section-form [style*="grid-template-columns:repeat(4,1fr)"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+}
+
+
+/* ============================================================
+   28. LIMBAH
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #sec-waste .section-form [style*="grid-template-columns:1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+}
+
+
+/* ============================================================
+   29. DETAIL MAHASISWA (sec-student-detail)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* Toolbar atas: stack vertikal */
+  #sec-student-detail > div:first-child {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: flex-start !important;
+  }
+
+  #sec-student-detail > div:first-child > div {
+    flex-wrap: wrap;
+  }
+
+  /* Tab font lebih kecil */
+  #sec-student-detail .tab-btn {
+    font-size: 11.5px;
+    padding: 6px 10px;
+  }
+
+  /* Print dropdown: ke kanan layar */
+  #sec-student-detail #printMenu {
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  /* Grid identitas → stack */
+  #detailIdentitasContent [style*="grid-template-columns:auto 1fr"],
+  #detailIdentitasContent [style*="grid-template-columns:1fr 1fr"],
+  #detailIdentitasContent [style*="grid-template-columns:1fr 1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+}
+
+
+/* ============================================================
+   30. DATA MAHASISWA EKSTERNAL (sec-mhs-ext)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* Header card: stack */
+  #sec-mhs-ext .card > div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  /* Filter bar: stack full width */
+  #sec-mhs-ext > div > div:last-child {
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100%;
+  }
+
+  #srchMhsExt,
+  #filterStatusMhsExt,
+  #filterTahunMhsExt {
+    width: 100% !important;
+  }
+}
+
+
+/* ============================================================
+   31. KELOLA USER (sec-user)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #sec-user [style*="grid-template-columns:1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+}
+
+
+/* ============================================================
+   32. INPUT STOK MODAL (mdlStok)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #mdlStok [style*="display:flex;gap:8px"] {
+    flex-direction: column !important;
+  }
+
+  #mdlStok [style*="display:flex;gap:8px"] button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #mdlStok [style*="grid-template-columns:1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+}
+
+
+/* ============================================================
+   33. AKUMULASI BARANG MAHASISWA
+   ============================================================ */
+
+@media (max-width: 560px) {
+  #sec-dash-mhs .card [style*="grid-template-columns:1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+}
+
+
+/* ============================================================
+   34. BODY BASE FONT
+   ============================================================ */
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+
+/* ============================================================
+   35. SAFE AREA — iPhone X dan lebih baru
+   ============================================================ */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+     #mainContent {
+      padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+    }
+  }
+}
+
+/* ============================================================
+   36. RIPPLE EFFECT (tap feedback di mobile)
+   ============================================================ */
+
+@keyframes mobileRipple {
+  from { transform: scale(0); opacity: 1; }
+  to   { transform: scale(4); opacity: 0; }
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  width: 60px;
+  height: 60px;
+  margin-top: -30px;
+  margin-left: -30px;
+  animation: mobileRipple 0.5s linear;
+  pointer-events: none;
+}
+
+/* ============================================================
+   37. PATCH — Kalibrasi & Top 10: grid 1fr 1.6fr → stack
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* Cover semua varian penulisan inline style */
+  [style*="grid-template-columns:1fr 1.6fr"],
+  [style*="grid-template-columns: 1fr 1.6fr"],
+  [style*="grid-template-columns:1fr 1.6fr;"],
+  [style*="grid-template-columns: 1fr 1.6fr;"] {
+    grid-template-columns: 1fr !important;
+  }
+}
