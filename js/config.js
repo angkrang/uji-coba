@@ -2,7 +2,7 @@
    KONFIGURASI — GANTI URL INI dengan URL GAS Web App Anda
    Deploy GAS sebagai: "Execute as: Me", "Who has access: Anyone"
    ============================================================ */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycby7E44WJvlbfY4lJjbM8heLN_bmw_BzNOJjpF3Ap_ecGuhZ_lWQgHWlSLPhidzDs2Rp/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwtCyKx9SRDNkeCEW1W63Rthe8wFUKVqlnmCBoowAqLP4684hj3VmKK3JSk76_CvMGR/exec';
 
 /* ============================================================
    GLOBAL STATE
