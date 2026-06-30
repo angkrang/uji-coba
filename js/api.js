@@ -6,7 +6,7 @@
  * (Code.gs di script.google.com), bukan di sini.
  */
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycby7E44WJvlbfY4lJjbM8heLN_bmw_BzNOJjpF3Ap_ecGuhZ_lWQgHWlSLPhidzDs2Rp/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwtCyKx9SRDNkeCEW1W63Rthe8wFUKVqlnmCBoowAqLP4684hj3VmKK3JSk76_CvMGR/execc';
 
 const gsr = (() => {
   let _successFn = null;
