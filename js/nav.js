@@ -62,7 +62,11 @@ function _applyRoleUI() {
     var niReq=document.getElementById('ni-req'); if(niReq) niReq.classList.add('hidden');
     var niRet=document.getElementById('ni-ret'); if(niRet) niRet.classList.add('hidden');
   } else if (_role === 'dosen') {
-    var niDsn=document.getElementById('ni-dosen'); if(niDsn) niDsn.classList.remove('hidden');
+    // Dosen: tampilan menu SAMA dengan admin, ditambah menu "Bimbingan Saya"
+    ['ni-mhs-ext','ni-inv','ni-pem','ni-pay','ni-user','ni-export','ni-audit','ni-maint','ni-waste','nl-admin-label','ni-dosen']
+      .forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('hidden'); });
+    var niReq2=document.getElementById('ni-req'); if(niReq2) niReq2.classList.add('hidden');
+    var niRet2=document.getElementById('ni-ret'); if(niRet2) niRet2.classList.add('hidden');
   } else {
     ['ni-req','ni-ret','ni-pay','ni-inv'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('hidden'); });
     var niMhsExt=document.getElementById('ni-mhs-ext'); if(niMhsExt) niMhsExt.classList.add('hidden');
@@ -131,12 +135,10 @@ function goTo(sec) {
   var mt=document.getElementById('mtTitle'); if(mt) mt.textContent=titleMap[sec]||'Dashboard';
 
   if (sec === 'dash') {
-    if (_role === 'admin') {
+    if (_role === 'admin' || _role === 'dosen') {
+      // Dosen: dashboard utama dibuat sama persis dengan tampilan admin
       var el = document.getElementById('sec-dash-admin'); if(el) el.classList.remove('hidden');
       loadAdminDash();
-    } else if (_role === 'dosen') {
-      var elD = document.getElementById('sec-dosen'); if(elD) elD.classList.remove('hidden');
-      loadDosenDashboard();
     } else {
       var el2 = document.getElementById('sec-dash-mhs'); if(el2) el2.classList.remove('hidden');
       loadMhsAll();
@@ -168,7 +170,7 @@ function goTo(sec) {
 
   } else if (sec === 'pay') {
     var el = document.getElementById('sec-pay'); if(el) el.classList.remove('hidden');
-    if (_role === 'admin') {
+    if (_role === 'admin' || _role === 'dosen') {
       document.getElementById('pay-mhs-view').classList.add('hidden');
       document.getElementById('pay-admin-view').classList.remove('hidden');
       loadAdminPayRequests();
@@ -261,7 +263,7 @@ async function doLogin() {
       hideAllSec();
       _chemData=[]; _toolData=[]; _hargaMap={};
       goTo('dash');
-      if (_role === 'admin') refreshNavBadges();
+      if (_role === 'admin' || _role === 'dosen') refreshNavBadges();
     } else {
       Swal.fire({ icon:'error', title:'Login Gagal', text:'Username atau password salah. Periksa kembali data Anda.' });
     }
