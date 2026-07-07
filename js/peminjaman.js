@@ -131,7 +131,7 @@ async function cancelClear(nim) {
 }
 
 async function resetClear(nim) {
-  var r=await Swal.fire({title:'Reset Bebas Lab?',text:'Status mahasiswa akan dikembalikan ke awal untuk periode baru.',icon:'warning',showCancelButton:true,confirmButtonText:'Reset',cancelButtonText:'Batal',confirmButtonColor:'#DB8A52'});
+  var r=await Swal.fire({title:'Reset Bebas Lab?',text:'Status mahasiswa akan dikembalikan ke awal untuk periode baru.',icon:'warning',showCancelButton:true,confirmButtonText:'Reset',cancelButtonText:'Batal',confirmButtonColor:'#f97316'});
   if(r.isConfirmed){ try { var res=await callGAS('resetLabClearance',{nim:nim,adminNim:_uname}); if(res.success){ Swal.fire('Berhasil','Status berhasil direset','success'); loadPem(); } else Swal.fire('Gagal',res.message,'error'); } catch(e) {} }
 }
 

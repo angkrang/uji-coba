@@ -269,7 +269,7 @@ html, body {
   background: #f8fafc;
 }
 .tagihan-form-table tfoot td.label { text-align: right; }
-.tagihan-form-table tfoot td.value { text-align: right; color: var(--warning, #B96B38); }
+.tagihan-form-table tfoot td.value { text-align: right; color: var(--warning, #c2410c); }
 .tagihan-form-table tfoot tr.total-row td { font-size: 14px; }
  
 .tagihan-form-terbilang {

@@ -609,7 +609,7 @@ function _renderSurveiStackedBar(res) {
 
   var pct = avgPerParam.map(function(avg) { return scoreToPct(avg); });
 
-  var colors = ['#ef4444','#DB8A52','#6B93C0','#22c55e'];
+  var colors = ['#ef4444','#f97316','#3b82f6','#22c55e'];
   var labels = ['1 - Kurang','2 - Cukup','3 - Puas','4 - Sangat Puas'];
 
   var legendHtml = '<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:8px;font-size:12px;color:var(--muted);">'
@@ -642,8 +642,8 @@ function _renderSurveiStackedBar(res) {
       }),
       datasets: [
         { label: '1 - Kurang',      data: pct.map(function(r) { return r[0]; }), backgroundColor: '#ef4444', borderSkipped: false },
-        { label: '2 - Cukup',       data: pct.map(function(r) { return r[1]; }), backgroundColor: '#DB8A52', borderSkipped: false },
-        { label: '3 - Puas',        data: pct.map(function(r) { return r[2]; }), backgroundColor: '#6B93C0', borderSkipped: false },
+        { label: '2 - Cukup',       data: pct.map(function(r) { return r[1]; }), backgroundColor: '#f97316', borderSkipped: false },
+        { label: '3 - Puas',        data: pct.map(function(r) { return r[2]; }), backgroundColor: '#3b82f6', borderSkipped: false },
         { label: '4 - Sangat Puas', data: pct.map(function(r) { return r[3]; }), backgroundColor: '#22c55e', borderSkipped: false }
       ]
     },

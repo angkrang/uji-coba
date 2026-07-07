@@ -226,7 +226,7 @@ async function submitPaymentReq() {
   try { detail=JSON.parse(bodyEl.dataset.detail||'[]'); } catch(e) {}
   var detail2=[];try{detail2=JSON.parse(bodyEl.dataset.detail||'[]');}catch(e){}
   if(!detail2.length){ Swal.fire('Peringatan','Tidak ada bahan kimia yang bisa diajukan','warning'); return; }
-  var totalLabel = total>0 ? 'Total tagihan: <strong>'+formatRupiah(total)+'</strong>' : '<span style="color:#B96B38;">⚠️ Harga bahan belum diisi di sistem. Tagihan akan diajukan dengan total Rp 0 — admin dapat menyesuaikan.</span>';
+  var totalLabel = total>0 ? 'Total tagihan: <strong>'+formatRupiah(total)+'</strong>' : '<span style="color:#c2410c;">⚠️ Harga bahan belum diisi di sistem. Tagihan akan diajukan dengan total Rp 0 — admin dapat menyesuaikan.</span>';
   var r=await Swal.fire({title:'Ajukan Tagihan?',html:totalLabel+'<br><small style="color:#6b7280;">'+detail2.length+' item bahan kimia</small>',icon:'question',showCancelButton:true,confirmButtonText:'Ya, Ajukan',cancelButtonText:'Batal'});
   if(!r.isConfirmed) return;
   Swal.fire({title:'Mengirim...',allowOutsideClick:false,didOpen:function(){Swal.showLoading();}});
@@ -290,7 +290,7 @@ function viewPayDetail(idReq) {
   bodyEl.innerHTML = '<div style="padding:14px 16px;">'
     + _renderFormulirTable(nama, nim, '', items, total)
     + '<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">'
-    + '<button class="btn btn-sm" style="background:#385780;color:#fff;border:none;cursor:pointer;border-radius:8px;font-size:13px;font-weight:600;padding:8px 18px;" onclick="printBon(\''+esc(idReq)+'\')">'
+    + '<button class="btn btn-sm" style="background:#1d4ed8;color:#fff;border:none;cursor:pointer;border-radius:8px;font-size:13px;font-weight:600;padding:8px 18px;" onclick="printBon(\''+esc(idReq)+'\')">'
     + '<i class="bi bi-printer"></i> Cetak Bon</button>'
     + '</div>'
     + '</div>';
@@ -376,8 +376,8 @@ function printKalibrasiBlangko() {
     lines += '<div style="position:absolute;left:' + (x + 0.7) + 'mm;top:1mm;font-size:6.5pt;color:#e11d48;font-family:Arial;">' + x + '</div>';
   }
   for (var y = 0; y <= 290; y += 10) {
-    lines += '<div style="position:absolute;left:0;top:' + y + 'mm;width:210mm;height:0.2mm;background:#4C6FA5;opacity:0.55;"></div>';
-    lines += '<div style="position:absolute;left:1mm;top:' + (y + 0.7) + 'mm;font-size:6.5pt;color:#4C6FA5;font-family:Arial;">' + y + '</div>';
+    lines += '<div style="position:absolute;left:0;top:' + y + 'mm;width:210mm;height:0.2mm;background:#2563eb;opacity:0.55;"></div>';
+    lines += '<div style="position:absolute;left:1mm;top:' + (y + 0.7) + 'mm;font-size:6.5pt;color:#2563eb;font-family:Arial;">' + y + '</div>';
   }
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kalibrasi Blangko</title>'
     + '<style>@page{size:A4;margin:0;}*{box-sizing:border-box;margin:0;padding:0;}html,body{width:210mm;height:297mm;position:relative;}@media print{button{display:none!important;}}</style>'
