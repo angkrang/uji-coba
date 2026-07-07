@@ -32,6 +32,18 @@ function setActive(navId) {
   if (el) el.classList.add('active');
 }
 
+function _updateHeroGreeting() {
+  var h = new Date().getHours();
+  var sapaan = h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 19 ? 'Selamat sore' : 'Selamat malam';
+  var nama = (typeof _user !== 'undefined' && _user) ? _user.split(' ')[0] : '';
+  var teks = sapaan + (nama ? ', ' + nama : '') + '! 👋';
+  document.querySelectorAll('.js-hero-greeting').forEach(function(el){ el.textContent = teks; });
+  var tgl = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.querySelectorAll('.js-hero-date').forEach(function(el){ el.textContent = tgl; });
+  var hra=document.getElementById('heroRoleAdmin'); if(hra) hra.textContent=_roleLabel();
+  var hrm=document.getElementById('heroRoleMhs'); if(hrm) hrm.textContent=_roleLabel();
+}
+
 function _roleLabel() {
   if (_role === 'admin') return 'Administrator';
   if (_role === 'plp') return 'PLP';
@@ -53,6 +65,7 @@ function _applyRoleUI() {
   var sr=document.getElementById('sidebarRole'); if(sr) sr.textContent=_roleLabel();
   var mtn=document.getElementById('mtName'); if(mtn) mtn.textContent=_user;
   var mta=document.getElementById('mtAvatar'); if(mta) mta.innerHTML=avatarHtml;
+  _updateHeroGreeting();
 
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appWrap').classList.remove('hidden'); // FIX: tampilkan kembali mobile topbar setiap kali user berhasil login

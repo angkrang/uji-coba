@@ -164,6 +164,14 @@ body {
     padding-left: 14px;
     padding-right: 14px;
   }
+
+  /* Dashboard hero: rapatkan padding & tumpuk elemen di layar sempit */
+  .dash-hero { padding: 20px 18px; border-radius: 20px; }
+  .dash-hero-row { gap: 14px; }
+  .dash-hero-icon { width: 44px; height: 44px; border-radius: 13px; font-size: 19px; }
+  .dash-hero-greeting { font-size: 17px; }
+  .dash-hero-meta { width: 100%; }
+  .dash-hero-chip { font-size: 11.5px; padding: 8px 12px; }
 }
 
 /* ============================================================
