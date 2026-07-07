@@ -247,7 +247,7 @@ function _buildTh(col, sortState, type) {
     var isActive2 = cur !== '';
     var icFunnel = isActive2 ? 'bi-funnel-fill' : 'bi-funnel';
     var btnStyle = isActive2
-      ? 'background:rgba(37,99,235,0.12);color:var(--primary);'
+      ? 'background:rgba(76,111,165,0.12);color:var(--primary);'
       : 'background:transparent;color:#94a3b8;';
     filterHtml = ' <button class="inv-filter-btn" '
       + 'style="' + btnStyle + '" '

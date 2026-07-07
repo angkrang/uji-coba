@@ -21,7 +21,7 @@ async function loadUsers() {
       }
       var initials=(u.nama||'?').charAt(0).toUpperCase();
       var fotoUser=u.foto||(isMahasiswa?'assets/foto-profil-default.png':'');
-      var avatarCell='<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;overflow:hidden;">'+_avatarHtml(initials,fotoUser)+'</div>';
+      var avatarCell='<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4C6FA5,#6B93C0);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;overflow:hidden;">'+_avatarHtml(initials,fotoUser)+'</div>';
       return '<tr class="user-row" data-s="'+esc((u.username+u.nama).toLowerCase())+'">'
         +'<td>'+avatarCell+'</td>'
         +'<td><code>'+esc(u.username)+'</code></td>'
@@ -29,7 +29,7 @@ async function loadUsers() {
         +'<td>'+rb+'</td>'
         +'<td style="display:flex;gap:4px;flex-wrap:wrap;">'
         +'<button class="btn btn-xs btn-outline" onclick="openEditUser(\''+esc(u.username)+'\',\''+esc(u.nama)+'\',\''+esc(u.role)+'\',\''+esc(u.foto||'')+'\')"><i class="bi bi-key"></i> Reset Pass</button>'
-        +'<button class="btn btn-xs" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;cursor:pointer;border-radius:6px;font-size:11px;font-weight:600;" data-uname="'+esc(u.username)+'" data-nama="'+esc(u.nama)+'" data-role="'+esc(u.role)+'" data-foto="'+esc(u.foto||'')+'" onclick="openUbahFotoAdmin(this)"><i class="bi bi-camera"></i> Foto</button>'
+        +'<button class="btn btn-xs" style="background:#eff6ff;color:#385780;border:1px solid #bfdbfe;cursor:pointer;border-radius:6px;font-size:11px;font-weight:600;" data-uname="'+esc(u.username)+'" data-nama="'+esc(u.nama)+'" data-role="'+esc(u.role)+'" data-foto="'+esc(u.foto||'')+'" onclick="openUbahFotoAdmin(this)"><i class="bi bi-camera"></i> Foto</button>'
         +delBtn+'</td></tr>';
     }).join('');
   } catch(e) {}

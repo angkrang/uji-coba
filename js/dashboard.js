@@ -181,9 +181,9 @@ function _renderDetailIdentitas(d) {
   el.innerHTML=
     '<div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;margin-bottom:20px;">'
       +'<div style="display:flex;flex-direction:column;align-items:center;gap:8px;">'
-        +'<div style="width:80px;height:80px;border-radius:50%;overflow:hidden;box-shadow:0 8px 24px rgba(37,99,235,0.25);">'
+        +'<div style="width:80px;height:80px;border-radius:50%;overflow:hidden;box-shadow:0 8px 24px rgba(76,111,165,0.25);">'
           +'<img src="assets/foto-profil-default.png" style="width:100%;height:100%;object-fit:cover;" '
-          +'onerror="this.parentElement.innerHTML=\'<div style=width:100%;height:100%;background:linear-gradient(135deg,#2563eb,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;\'>'+initials+'</div>\'">'
+          +'onerror="this.parentElement.innerHTML=\'<div style=width:100%;height:100%;background:linear-gradient(135deg,#4C6FA5,#6B93C0);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;\'>'+initials+'</div>\'">'
         +'</div>'
         +'<span class="badge '+bbc+'" style="font-size:10.5px;">'+esc(d.status_bebas||'Belum Bebas Lab')+'</span>'
       +'</div>'
@@ -204,7 +204,7 @@ function _renderDetailIdentitas(d) {
         +'<span class="badge '+sc+'">'+esc(sisa)+'</span>'
       +'</div>'
       +'<div style="background:#e2e8f0;border-radius:999px;height:8px;overflow:hidden;">'
-        +'<div style="height:100%;width:'+progress+'%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:999px;"></div>'
+        +'<div style="height:100%;width:'+progress+'%;background:linear-gradient(90deg,#4C6FA5,#6B93C0);border-radius:999px;"></div>'
       +'</div>'
       +'<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--muted);">'
         +'<span>'+esc(d.tanggalMulai||'—')+'</span>'
@@ -304,7 +304,7 @@ function _renderDetailBon(data) {
     +'</tr></thead><tbody>'+rows+'</tbody>'
     +'<tfoot><tr style="background:#dbeafe;">'
     +'<td colspan="8" style="text-align:right;padding:8px;font-weight:bold;font-size:12px;">TOTAL BIAYA</td>'
-    +'<td style="text-align:right;padding:8px;font-weight:bold;color:#2563eb;">Rp '+total.toLocaleString('id-ID')+'</td>'
+    +'<td style="text-align:right;padding:8px;font-weight:bold;color:#4C6FA5;">Rp '+total.toLocaleString('id-ID')+'</td>'
     +'</tr></tfoot></table></div>'
     +'<div style="font-size:12px;color:var(--muted);margin-top:8px;text-align:right;">Menampilkan <strong>'+filtered.length+'</strong> dari <strong>'+data.length+'</strong> entri</div>';
 }
@@ -464,7 +464,7 @@ function printStudentFull(){
 function _triggerPrint(judul,content){
   var now=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
   var win=window.open('','_blank','width=900,height=700');
-  win.document.write('<!DOCTYPE html><html><head><title>'+judul+'</title><style>body{font-family:"Segoe UI",Arial,sans-serif;font-size:13px;color:#1e293b;margin:24px;}h1{font-size:17px;margin-bottom:2px;}h3{font-size:14px;color:#2563eb;border-bottom:2px solid #2563eb;padding-bottom:4px;}.meta{font-size:11px;color:#64748b;margin-bottom:16px;}table{width:100%;border-collapse:collapse;margin-bottom:16px;}th,td{border:1px solid #e2e8f0;padding:5px 8px;text-align:left;font-size:11px;}thead tr{background:#f1f5f9;}@media print{body{margin:10mm;}}</style></head><body>'
+  win.document.write('<!DOCTYPE html><html><head><title>'+judul+'</title><style>body{font-family:"Segoe UI",Arial,sans-serif;font-size:13px;color:#1e293b;margin:24px;}h1{font-size:17px;margin-bottom:2px;}h3{font-size:14px;color:#4C6FA5;border-bottom:2px solid #4C6FA5;padding-bottom:4px;}.meta{font-size:11px;color:#64748b;margin-bottom:16px;}table{width:100%;border-collapse:collapse;margin-bottom:16px;}th,td{border:1px solid #e2e8f0;padding:5px 8px;text-align:left;font-size:11px;}thead tr{background:#f1f5f9;}@media print{body{margin:10mm;}}</style></head><body>'
     +'<h1>'+judul+'</h1><div class="meta">Laboratorium Kimia &amp; Biokimia Pangan &nbsp;|&nbsp; Dicetak: '+now+'</div>'
     +'<hr style="border:none;border-top:2px solid #e2e8f0;margin-bottom:16px;">'+content+'</body></html>');
   win.document.close();
@@ -520,7 +520,7 @@ async function loadAdminStudentCards(){
         var cardStyle='flex:1 1 180px;min-width:0;max-width:260px;';
         var cardClick=nim?('onclick="loadStudentDetail(\''+esc(nim)+'\')" style="'+cardStyle+'cursor:pointer;"')
                          :('style="'+cardStyle+'cursor:default;opacity:0.85;"');
-        var hoverIn =nim?'this.style.borderColor=\'var(--primary)\';this.style.boxShadow=\'0 4px 16px rgba(37,99,235,0.12)\'':'';
+        var hoverIn =nim?'this.style.borderColor=\'var(--primary)\';this.style.boxShadow=\'0 4px 16px rgba(76,111,165,0.12)\'':'';
         var hoverOut=nim?'this.style.borderColor=\'var(--border)\';this.style.boxShadow=\'\'':'';
         html+='<div class="identity-card" '+cardClick
           +' onmouseover="'+hoverIn+'" onmouseout="'+hoverOut+'">'
@@ -576,7 +576,7 @@ function _mkChart(canvasId, lbl, vals, c1, c2, oldInst){
 async function loadAdminCharts(){
   try{
     var res=await callGAS('getAnalyticsData');
-    cBahanInst=_mkChart('chartBahan',res.chem.labels,res.chem.values,'#2563eb','#93c5fd',cBahanInst);
+    cBahanInst=_mkChart('chartBahan',res.chem.labels,res.chem.values,'#4C6FA5','#93c5fd',cBahanInst);
     cAlatInst=_mkChart('chartAlat',res.tool.labels,res.tool.values,'#059669','#6ee7b7',cAlatInst);
     window._chartBahan = cBahanInst;
     window._chartAlat  = cAlatInst;
@@ -641,7 +641,7 @@ async function loadMhsExternalSummary(){
       if(ctx1&&tahunLabels.length){
         new Chart(ctx1.getContext('2d'),{
           type:'line',
-          data:{labels:tahunLabels,datasets:[{data:tahunVals,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',borderWidth:2.5,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:6,tension:0.35,fill:true}]},
+          data:{labels:tahunLabels,datasets:[{data:tahunVals,borderColor:'#4C6FA5',backgroundColor:'rgba(76,111,165,0.08)',borderWidth:2.5,pointBackgroundColor:'#4C6FA5',pointRadius:4,pointHoverRadius:6,tension:0.35,fill:true}]},
           options:{responsive:true,maintainAspectRatio:false,
             plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f172a',titleColor:'#f1f5f9',bodyColor:'#94a3b8',cornerRadius:8,callbacks:{label:function(c){return '  '+c.parsed.y+' mahasiswa';}}}},
             scales:{x:{grid:{display:false},ticks:{font:{size:11},color:'#64748b'}},y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:11},color:'#94a3b8',stepSize:1}}},
@@ -650,7 +650,7 @@ async function loadMhsExternalSummary(){
       }
       var ctx2=document.getElementById('chartMhsTujuan');
       if(ctx2){
-        var donutColors=['#2563eb','#059669','#7c3aed','#db2777','#94a3b8'];
+        var donutColors=['#4C6FA5','#059669','#7c3aed','#db2777','#94a3b8'];
         var donutLabels=['S1/Skripsi','S2/Tesis','S3/Disertasi','PKM','Lainnya'];
         var donutData=[s.s1,s.s2,s.s3,s.pkm,s.lainnya];
         var donutTotal=donutData.reduce(function(a,b){return a+b;},0);
@@ -955,7 +955,7 @@ function _mhsExtTh(label,hasFilter,fKey,fVals){
   if(!hasFilter||!fKey||!fVals||!fVals.length) return '<th style="white-space:nowrap;">'+esc(label)+'</th>';
   var cur=_getMhsFilterVal(fKey),isActive=cur!=='';
   var icFunnel=isActive?'bi-funnel-fill':'bi-funnel';
-  var btnStyle=isActive?'background:rgba(37,99,235,0.12);color:var(--primary);':'background:transparent;color:#94a3b8;';
+  var btnStyle=isActive?'background:rgba(76,111,165,0.12);color:var(--primary);':'background:transparent;color:#94a3b8;';
   return '<th style="white-space:nowrap;"><span style="display:inline-flex;align-items:center;gap:3px;">'+esc(label)
     +'<button class="inv-filter-btn" style="'+btnStyle+'" onclick="openMhsExtDrop(event,\''+fKey+'\',this)" title="Filter '+esc(label)+'">'
     +'<i class="bi '+icFunnel+'" style="font-size:11px;pointer-events:none;"></i></button></span></th>';
@@ -1082,7 +1082,7 @@ async function loadSurveiTren() {
       return '<span style="color:#64748b;font-size:10px;margin-left:4px;">— stabil</span>';
     }
 
-    function katColor(a) { a = parseFloat(a); return isNaN(a) ? '#6b7280' : a >= 3.5 ? '#16a34a' : a >= 2.5 ? '#2563eb' : a >= 1.5 ? '#ea580c' : '#dc2626'; }
+    function katColor(a) { a = parseFloat(a); return isNaN(a) ? '#6b7280' : a >= 3.5 ? '#16a34a' : a >= 2.5 ? '#4C6FA5' : a >= 1.5 ? '#B96B38' : '#dc2626'; }
     function katLabel(a) { a = parseFloat(a); return isNaN(a) ? '—' : a >= 3.5 ? 'Sangat Puas' : a >= 2.5 ? 'Puas' : a >= 1.5 ? 'Cukup' : 'Kurang'; }
 
     var statHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px;">';
@@ -1113,9 +1113,9 @@ async function loadSurveiTren() {
     // Chart
     var chartHtml = '<div style="position:relative;height:220px;"><canvas id="chartSurveiTren"></canvas></div>'
       + '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:10.5px;color:#64748b;">'
-      + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:3px;background:#2563eb;display:inline-block;border-radius:2px;"></span>Rata-rata</span>'
+      + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:3px;background:#4C6FA5;display:inline-block;border-radius:2px;"></span>Rata-rata</span>'
       + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#ef4444;display:inline-block;border-radius:2px;border:1px dashed #ef4444;"></span>P1 Pelayanan</span>'
-      + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#f97316;display:inline-block;border-radius:2px;border:1px dashed #f97316;"></span>P2 Bahan</span>'
+      + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#DB8A52;display:inline-block;border-radius:2px;border:1px dashed #DB8A52;"></span>P2 Bahan</span>'
       + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#8b5cf6;display:inline-block;border-radius:2px;border:1px dashed #8b5cf6;"></span>P3 Peralatan</span>'
       + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#059669;display:inline-block;border-radius:2px;border:1px dashed #059669;"></span>P4 K3</span>'
       + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#db2777;display:inline-block;border-radius:2px;border:1px dashed #db2777;"></span>P5 Sarana</span>'
@@ -1147,9 +1147,9 @@ async function loadSurveiTren() {
         data: {
           labels: labels,
           datasets: [
-            makeDataset('Rata-rata', avgKeseluruhan, '#2563eb', false),
+            makeDataset('Rata-rata', avgKeseluruhan, '#4C6FA5', false),
             makeDataset('P1 Pelayanan', avgP1, '#ef4444', true),
-            makeDataset('P2 Bahan', avgP2, '#f97316', true),
+            makeDataset('P2 Bahan', avgP2, '#DB8A52', true),
             makeDataset('P3 Peralatan', avgP3, '#8b5cf6', true),
             makeDataset('P4 K3', avgP4, '#059669', true),
             makeDataset('P5 Sarana', avgP5, '#db2777', true)

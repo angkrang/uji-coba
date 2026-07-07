@@ -226,8 +226,8 @@ function _doPDF(d) {
       + '<div class="chart-title">Distribusi Skor per Parameter (100% Stacked Bar)</div>'
       + '<div class="chart-legend">'
       + '<span><span class="leg" style="background:#ef4444"></span>1 - Kurang</span>'
-      + '<span><span class="leg" style="background:#f97316"></span>2 - Cukup</span>'
-      + '<span><span class="leg" style="background:#3b82f6"></span>3 - Puas</span>'
+      + '<span><span class="leg" style="background:#DB8A52"></span>2 - Cukup</span>'
+      + '<span><span class="leg" style="background:#6B93C0"></span>3 - Puas</span>'
       + '<span><span class="leg" style="background:#22c55e"></span>4 - Sangat Puas</span>'
       + '<span style="margin-left:auto;font-size:10px;color:#6b7280;">' + infoSumber + '</span>'
       + '</div>'
@@ -256,8 +256,8 @@ function _doPDF(d) {
       + '      labels:labels,'
       + '      datasets:['
       + '        {label:"1-Kurang",     data:pct.map(function(r){return r[0];}),backgroundColor:"#ef4444",borderSkipped:false},'
-      + '        {label:"2-Cukup",      data:pct.map(function(r){return r[1];}),backgroundColor:"#f97316",borderSkipped:false},'
-      + '        {label:"3-Puas",       data:pct.map(function(r){return r[2];}),backgroundColor:"#3b82f6",borderSkipped:false},'
+      + '        {label:"2-Cukup",      data:pct.map(function(r){return r[1];}),backgroundColor:"#DB8A52",borderSkipped:false},'
+      + '        {label:"3-Puas",       data:pct.map(function(r){return r[2];}),backgroundColor:"#6B93C0",borderSkipped:false},'
       + '        {label:"4-Sangat Puas",data:pct.map(function(r){return r[3];}),backgroundColor:"#22c55e",borderSkipped:false}'
       + '      ]'
       + '    },'
@@ -319,7 +319,7 @@ function _doPDF(d) {
     + '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"><\/script>'
     + '<style>'
     + 'body{font-family:\'Inter\',Arial,sans-serif;font-size:12px;margin:20px;}'
-    + 'h2{color:#1e40af;border-bottom:3px solid #2563eb;padding-bottom:8px;}'
+    + 'h2{color:#1e40af;border-bottom:3px solid #4C6FA5;padding-bottom:8px;}'
     + '.meta{color:#64748b;font-size:11px;margin-bottom:14px;}'
     + '.param-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin-bottom:16px;}'
     + '.param-title{font-weight:700;color:#1e40af;font-size:12px;margin-bottom:6px;}'
@@ -365,7 +365,7 @@ function _doPDF(d) {
         var totalS=0,totalC=0; sumP.forEach(function(s,i){totalS+=s;totalC+=cntP[i];});
         var overall = totalC ? (totalS/totalC).toFixed(2) : '-';
         function katLabel(a) { a=parseFloat(a); return isNaN(a)?'-':a>=3.5?'Sangat Puas':a>=2.5?'Puas':a>=1.5?'Cukup':'Kurang'; }
-        function katColor(a) { a=parseFloat(a); return isNaN(a)?'#6b7280':a>=3.5?'#16a34a':a>=2.5?'#2563eb':a>=1.5?'#ea580c':'#dc2626'; }
+        function katColor(a) { a=parseFloat(a); return isNaN(a)?'#6b7280':a>=3.5?'#16a34a':a>=2.5?'#4C6FA5':a>=1.5?'#B96B38':'#dc2626'; }
         var thStyle = 'background:#dbeafe;color:#1e40af;font-size:11px;padding:8px;border:1px solid #e4eaf4;';
         var tdStyle = 'padding:7px 8px;border:1px solid #e4eaf4;';
         // Tabel 1: Per parameter
@@ -599,7 +599,7 @@ async function _doPDFSurveiWithPeriode(d) {
     showCancelButton: true,
     confirmButtonText: '<i class="bi bi-printer"></i> Cetak PDF',
     cancelButtonText: 'Batal',
-    confirmButtonColor: '#2563eb',
+    confirmButtonColor: '#4C6FA5',
     preConfirm: function() {
       return document.getElementById('swalPeriodeSelect').value;
     }
