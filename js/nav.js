@@ -32,10 +32,18 @@ function setActive(navId) {
   if (el) el.classList.add('active');
 }
 
+function _firstName(nama) {
+  if (!nama) return '';
+  var titles = /^(dr|drs|dra|prof|ir|hj|h)\.?$/i;
+  var parts = nama.trim().split(/\s+/);
+  if (parts.length > 1 && titles.test(parts[0])) return parts[0] + ' ' + parts[1];
+  return parts[0] || '';
+}
+
 function _updateHeroGreeting() {
   var h = new Date().getHours();
   var sapaan = h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 19 ? 'Selamat sore' : 'Selamat malam';
-  var nama = (typeof _user !== 'undefined' && _user) ? _user.split(' ')[0] : '';
+  var nama = (typeof _user !== 'undefined' && _user) ? _firstName(_user) : '';
   var teks = sapaan + (nama ? ', ' + nama : '') + '! 👋';
   document.querySelectorAll('.js-hero-greeting').forEach(function(el){ el.textContent = teks; });
   var tgl = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
