@@ -226,7 +226,7 @@ async function submitPaymentReq() {
   try { detail=JSON.parse(bodyEl.dataset.detail||'[]'); } catch(e) {}
   var detail2=[];try{detail2=JSON.parse(bodyEl.dataset.detail||'[]');}catch(e){}
   if(!detail2.length){ Swal.fire('Peringatan','Tidak ada bahan kimia yang bisa diajukan','warning'); return; }
-  var totalLabel = total>0 ? 'Total tagihan: <strong>'+formatRupiah(total)+'</strong>' : '<span style="color:#b45309;">⚠️ Harga bahan belum diisi di sistem. Tagihan akan diajukan dengan total Rp 0 — admin dapat menyesuaikan.</span>';
+  var totalLabel = total>0 ? 'Total tagihan: <strong>'+formatRupiah(total)+'</strong>' : '<span style="color:#c2410c;">⚠️ Harga bahan belum diisi di sistem. Tagihan akan diajukan dengan total Rp 0 — admin dapat menyesuaikan.</span>';
   var r=await Swal.fire({title:'Ajukan Tagihan?',html:totalLabel+'<br><small style="color:#6b7280;">'+detail2.length+' item bahan kimia</small>',icon:'question',showCancelButton:true,confirmButtonText:'Ya, Ajukan',cancelButtonText:'Batal'});
   if(!r.isConfirmed) return;
   Swal.fire({title:'Mengirim...',allowOutsideClick:false,didOpen:function(){Swal.showLoading();}});

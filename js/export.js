@@ -10,7 +10,8 @@ var _exportLabels = {
   audit_log:        'Audit Log',
   maintenance:      'Log Maintenance',
   waste:            'Log Limbah',
-  payment:          'Rekap Tagihan'
+  payment:          'Rekap Tagihan',
+  mahasiswa_aktif:  'Daftar Mahasiswa Aktif'
 };
 
 function triggerExport(tipe) {
@@ -24,7 +25,10 @@ async function doExport(fmt) {
   closeModal('mdlExport');
   Swal.fire({ title: 'Menyiapkan data...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
   try {
-    var res = await callGAS('getExportData', { tipe: _exportTipe });
+    /* Daftar Mahasiswa Aktif diambil dari endpoint mahasiswa, bukan getExportData */
+    var res = (_exportTipe === 'mahasiswa_aktif')
+      ? await _getMahasiswaAktifExportData()
+      : await callGAS('getExportData', { tipe: _exportTipe });
     Swal.close();
     if (!res.success) { Swal.fire('Error', res.message || 'Gagal mengambil data', 'error'); return; }
 
@@ -35,6 +39,54 @@ async function doExport(fmt) {
       if (fmt === 'excel') _doExcel(res); else _doPDF(res);
     }
   } catch(e) { Swal.close(); Swal.fire('Error', e.message, 'error'); }
+}
+
+/* Ambil jenjang (S1/S2/S3/Lainnya) dari kolom "tujuan", mis. "Skripsi (S1)", "Tesis (S2)", "Disertasi (S3)" */
+function _jenjangFromTujuan(tujuan) {
+  var t = (tujuan || '').toString().toUpperCase();
+  if (t.indexOf('S1') !== -1) return 'S1';
+  if (t.indexOf('S2') !== -1) return 'S2';
+  if (t.indexOf('S3') !== -1) return 'S3';
+  return 'Lainnya';
+}
+
+/* Susun data Daftar Mahasiswa Aktif ke bentuk {judul, tanggal, headers, rows, footer}
+   agar bisa dipakai oleh _doExcel() dan _doPDF() seperti laporan lainnya. */
+async function _getMahasiswaAktifExportData() {
+  var raw = await callGAS('getMahasiswaExternal');
+  var data = Array.isArray(raw) ? raw : (raw && raw.data ? raw.data : (raw && raw.result ? raw.result : []));
+  if (!data || data.error) {
+    return { success: false, message: (data && data.error) || 'Gagal memuat data mahasiswa.' };
+  }
+  var aktif = data.filter(function(m) { return (m.status || '').toString().toLowerCase().trim() === 'aktif'; });
+  if (!aktif.length) {
+    return { success: false, message: 'Tidak ada mahasiswa dengan status Aktif saat ini.' };
+  }
+  aktif.sort(function(a, b) { return (a.nama || '').toString().localeCompare((b.nama || '').toString()); });
+
+  var now = new Date();
+  var tglStr = ('0' + now.getDate()).slice(-2) + '/' + ('0' + (now.getMonth() + 1)).slice(-2) + '/' + now.getFullYear();
+
+  var rows = aktif.map(function(m, i) {
+    return [
+      i + 1,
+      m.nimLengkap || m.nim || '-',
+      m.nama || '-',
+      m.judul || '-',
+      _jenjangFromTujuan(m.tujuan),
+      m.pembimbing || '-',
+      m.tanggalSelesai || '-'
+    ];
+  });
+
+  return {
+    success: true,
+    judul: 'Daftar Mahasiswa Aktif Laboratorium KBPHP',
+    tanggal: tglStr,
+    headers: ['No.', 'NIM', 'Nama Mahasiswa', 'Judul Penelitian', 'Jenjang', 'Dosen Pembimbing', 'Akhir Ijin Penelitian'],
+    rows: rows,
+    footer: true
+  };
 }
 
 function _doExcel(d) {
@@ -267,7 +319,7 @@ function _doPDF(d) {
     + '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"><\/script>'
     + '<style>'
     + 'body{font-family:\'Inter\',Arial,sans-serif;font-size:12px;margin:20px;}'
-    + 'h2{color:#0f2d80;border-bottom:3px solid #1a56db;padding-bottom:8px;}'
+    + 'h2{color:#1e40af;border-bottom:3px solid #2563eb;padding-bottom:8px;}'
     + '.meta{color:#64748b;font-size:11px;margin-bottom:14px;}'
     + '.param-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin-bottom:16px;}'
     + '.param-title{font-weight:700;color:#1e40af;font-size:12px;margin-bottom:6px;}'
@@ -547,7 +599,7 @@ async function _doPDFSurveiWithPeriode(d) {
     showCancelButton: true,
     confirmButtonText: '<i class="bi bi-printer"></i> Cetak PDF',
     cancelButtonText: 'Batal',
-    confirmButtonColor: '#1a56db',
+    confirmButtonColor: '#2563eb',
     preConfirm: function() {
       return document.getElementById('swalPeriodeSelect').value;
     }

@@ -8,6 +8,41 @@ function esc(s) {
     .replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+/* ============================================================
+   NORMALISASI NIM (FRONTEND)
+   ------------------------------------------------------------
+   Beberapa sumber data NIM formatnya beda-beda: bisa penuh
+   dengan slash ("23/123456/TP/12345"), 8 digit tanpa pemisah,
+   atau sudah 6 digit polos. Fungsi ini menyeragamkan semuanya
+   ke 6 digit, mirror dari _normalizeNim() di Code.gs — supaya
+   perbandingan NIM antar bagian aplikasi (mis. _detailNim vs
+   username di modal edit) selalu konsisten walau sumber
+   datanya beda format.
+   ============================================================ */
+function _normalizeNimShort(nim) {
+  var s = (nim || '').toString().trim();
+  var slashMatch = s.match(/^\d{2}\/(\d{6})\//);
+  if (slashMatch) return slashMatch[1];
+  var slashShort = s.match(/^\d{2}\/(\d{6})$/);
+  if (slashShort) return slashShort[1];
+  if (/^\d{6}$/.test(s)) return s;
+  if (/^\d{8}$/.test(s)) return s.substring(2, 8);
+  return s;
+}
+
+/* ============================================================
+   AVATAR HELPER
+   Menampilkan foto profil asli (Dosen/Admin/PLP) jika tersedia,
+   jika tidak ada foto atau gagal dimuat → fallback ke inisial huruf.
+   ============================================================ */
+function _avatarHtml(initials, fotoUrl) {
+  initials = (initials || 'U').toString();
+  if (!fotoUrl) return esc(initials);
+  return '<img src="' + esc(fotoUrl) + '" alt="' + esc(initials) + '" '
+    + 'style="width:100%;height:100%;object-fit:cover;border-radius:50%;" '
+    + "onerror='this.parentElement.textContent=" + JSON.stringify(initials) + ";'>";
+}
+
 function openModal(id)  { var el=document.getElementById(id); if(el) el.classList.remove('hidden'); }
 function closeModal(id) { var el=document.getElementById(id); if(el) el.classList.add('hidden'); }
 
@@ -16,9 +51,17 @@ function formatRupiah(angka) {
   return 'Rp ' + Number(angka).toLocaleString('id-ID');
 }
 
+/* ============================================================
+   STATUS BADGE / WARNA
+   ------------------------------------------------------------
+   FIX: mengenali status "Tidak Ada Peminjaman" / "Tidak Ada
+   Permintaan" (hasil migrasi bon legacy — mahasiswa yang memang
+   tidak pernah punya transaksi alat/bahan sama sekali) sebagai
+   status hijau/aman, setara dengan "Sudah Kembali"/"Lunas".
+   ============================================================ */
 function statusBadge(v) {
   var c='b-gray', vl=(v||'').toLowerCase().trim();
-  if (vl==='sudah kembali'||vl==='lunas'||vl==='approved'||vl==='aman'||vl==='tersedia') c='b-green';
+  if (vl==='sudah kembali'||vl==='lunas'||vl==='approved'||vl==='aman'||vl==='tersedia'||vl==='tidak ada peminjaman'||vl==='tidak ada permintaan') c='b-green';
   else if (vl==='sebagian'||vl==='hampir habis'||vl==='jumlah terbatas') c='b-amber';
   else if (vl==='belum kembali'||vl==='belum lunas'||vl==='kritis'||vl==='habis'||vl==='stok minim') c='b-red';
   return '<span class="badge '+c+'">'+esc(v)+'</span>';
@@ -26,9 +69,22 @@ function statusBadge(v) {
 
 function selClass(v) {
   var vl=(v||'').toLowerCase();
-  if (vl==='sudah kembali'||vl==='lunas'||vl==='approved') return 'sel-green';
+  if (vl==='sudah kembali'||vl==='lunas'||vl==='approved'||vl==='tidak ada peminjaman'||vl==='tidak ada permintaan') return 'sel-green';
   if (vl==='sebagian') return 'sel-amber';
   return 'sel-red';
+}
+
+/* Status yang setara "tidak berutang" untuk syarat Bebas Lab —
+   sinkron dengan backend approveLabClearance() yang juga menerima
+   "Tidak Ada Peminjaman"/"Tidak Ada Permintaan". Dipakai di
+   peminjaman.js (tombol APPROVE) dan dashboard.js (checklist). */
+function isKembaliOk(v) {
+  var vl=(v||'').toLowerCase();
+  return vl==='sudah kembali'||vl==='tidak ada peminjaman';
+}
+function isLunasOk(v) {
+  var vl=(v||'').toLowerCase();
+  return vl==='lunas'||vl==='tidak ada permintaan';
 }
 
 function hideSplash() {
@@ -74,9 +130,8 @@ function hideAllSec() {
     'sec-audit',
     'sec-maint',
     'sec-waste',
-    'sec-survei',         // FIX #1: ditambahkan — sebelumnya tidak ada
+    'sec-survei'          // FIX #1: ditambahkan — sebelumnya tidak ada
                           // FIX #8: duplikat 'sec-student-detail' dihapus
-    'sec-dosen'           // DOSEN: dashboard bimbingan
   ].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.classList.add('hidden');
@@ -91,8 +146,10 @@ function hideAllSec() {
    ============================================================ */
 function resetAllNavVisibility() {
   [
+    'ni-mhs-ext',
     'ni-inv',
     'ni-req',
+    'ni-ret',
     'ni-pay',
     'ni-pem',
     'ni-user',
@@ -101,9 +158,9 @@ function resetAllNavVisibility() {
     'ni-maint',
     'ni-waste',
     'nl-admin-label',
+    'ni-dosen',            // FIX: reset menu "Bimbingan Saya" agar tidak nyangkut di role lain
     'ni-survei',          // FIX #2: ditambahkan
-    'nl-survei-label',    // FIX #2: ditambahkan
-    'ni-dosen'            // DOSEN: menu bimbingan
+    'nl-survei-label'     // FIX #2: ditambahkan
   ].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.classList.add('hidden');

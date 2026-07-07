@@ -25,7 +25,7 @@ var _surveiPeriodeAktif = 'ALL'; // state filter rekap periode (admin)
 function initSurveiPage() {
   var mhsView = document.getElementById('survei-mhs-view');
   var adminView = document.getElementById('survei-admin-view');
-  if (_role === 'admin') {
+  if (_role === 'admin' || _role === 'plp') {
     if (mhsView) mhsView.classList.add('hidden');
     if (adminView) adminView.classList.remove('hidden');
     resetSurveiForm();

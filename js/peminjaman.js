@@ -65,10 +65,14 @@ async function loadPem() {
       var strB=item.chemicals.length>0?item.chemicals.map(function(c){ return '• '+c.name+' ('+c.qty+' '+c.unit+')'; }).join('<br>'):'<span style="color:var(--muted);font-size:12px;">—</span>';
       var strA=item.equipments.length>0?item.equipments.map(function(e){ return '• '+e.name+' ('+e.qty+' '+e.unit+')'; }).join('<br>'):'<span style="color:var(--muted);font-size:12px;">—</span>';
       var ck=selClass(item.status_kembali), cb=selClass(item.status_bayar);
-      var isEligible=item.status_kembali==='Sudah Kembali'&&item.status_bayar==='Lunas';
+      /* FIX: pakai isKembaliOk/isLunasOk (bukan exact-match) supaya
+         mahasiswa dengan status "Tidak Ada Peminjaman"/"Tidak Ada
+         Permintaan" (tidak pernah ada transaksi) juga dianggap lolos
+         syarat Bebas Lab — sinkron dengan approveLabClearance() di backend. */
+      var isEligible=isKembaliOk(item.status_kembali)&&isLunasOk(item.status_bayar);
       var bc='b-gray'; if(item.status_bebas==='Approved') bc='b-green'; else if(item.status_bebas==='Belum Bebas Lab') bc='b-red';
       var btnKembali=item.equipments.length>0?'<button class="btn btn-xs" style="background:#dcfce7;color:#166534;border:none;cursor:pointer;border-radius:6px;font-size:11px;font-weight:600;" onclick="openKembali(\''+esc(item.nim)+'\',\''+esc(item.nama)+'\')"><i class="bi bi-arrow-return-left"></i> Kembalikan</button>':'';
-      var tooltipBebas=''; if(!isEligible){ var tipMsg=item.status_kembali!=='Sudah Kembali'?'Alat belum kembali':'Tagihan belum lunas'; tooltipBebas='title="'+tipMsg+'"'; }
+      var tooltipBebas=''; if(!isEligible){ var tipMsg=!isKembaliOk(item.status_kembali)?'Alat belum kembali':'Tagihan belum lunas'; tooltipBebas='title="'+tipMsg+'"'; }
       var btnBebas='';
       if(item.status_bebas==='Approved'){
         btnBebas='<button class="btn btn-xs" style="background:#fee2e2;color:#991b1b;border:none;cursor:pointer;border-radius:6px;font-size:11px;font-weight:600;" onclick="cancelClear(\''+esc(item.nim)+'\')">Batal Approve</button>';
@@ -84,10 +88,12 @@ async function loadPem() {
         +'<td><select class="sel-badge '+ck+'" onchange="chgKembali(this,\''+esc(item.nim)+'\')">'
         +'<option '+(item.status_kembali==='Belum Kembali'?'selected':'')+'>Belum Kembali</option>'
         +'<option '+(item.status_kembali==='Sebagian'?'selected':'')+'>Sebagian</option>'
-        +'<option '+(item.status_kembali==='Sudah Kembali'?'selected':'')+'>Sudah Kembali</option></select></td>'
+        +'<option '+(item.status_kembali==='Sudah Kembali'?'selected':'')+'>Sudah Kembali</option>'
+        +'<option '+(item.status_kembali==='Tidak Ada Peminjaman'?'selected':'')+'>Tidak Ada Peminjaman</option></select></td>'
         +'<td><select class="sel-badge '+cb+'" onchange="chgBayar(this,\''+esc(item.nim)+'\')">'
         +'<option '+(item.status_bayar==='Belum Lunas'?'selected':'')+'>Belum Lunas</option>'
-        +'<option '+(item.status_bayar==='Lunas'?'selected':'')+'>Lunas</option></select></td>'
+        +'<option '+(item.status_bayar==='Lunas'?'selected':'')+'>Lunas</option>'
+        +'<option '+(item.status_bayar==='Tidak Ada Permintaan'?'selected':'')+'>Tidak Ada Permintaan</option></select></td>'
         +'<td><span class="badge '+bc+'">'+esc(item.status_bebas)+'</span></td>'
         +'<td><div style="display:flex;flex-wrap:wrap;gap:4px;">'
         +'<button class="btn btn-xs btn-outline" onclick="viewDetail(\''+esc(item.nim)+'\')"><i class="bi bi-eye"></i> Detail</button>'
@@ -125,7 +131,7 @@ async function cancelClear(nim) {
 }
 
 async function resetClear(nim) {
-  var r=await Swal.fire({title:'Reset Bebas Lab?',text:'Status mahasiswa akan dikembalikan ke awal untuk periode baru.',icon:'warning',showCancelButton:true,confirmButtonText:'Reset',cancelButtonText:'Batal',confirmButtonColor:'#d97706'});
+  var r=await Swal.fire({title:'Reset Bebas Lab?',text:'Status mahasiswa akan dikembalikan ke awal untuk periode baru.',icon:'warning',showCancelButton:true,confirmButtonText:'Reset',cancelButtonText:'Batal',confirmButtonColor:'#f97316'});
   if(r.isConfirmed){ try { var res=await callGAS('resetLabClearance',{nim:nim,adminNim:_uname}); if(res.success){ Swal.fire('Berhasil','Status berhasil direset','success'); loadPem(); } else Swal.fire('Gagal',res.message,'error'); } catch(e) {} }
 }
 

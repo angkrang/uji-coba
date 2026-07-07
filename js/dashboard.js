@@ -38,7 +38,13 @@ async function openModalAllStudents() {
   if(tb) tb.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-title">Memuat data...</div></div></td></tr>';
   document.getElementById('srchStudentModal').value='';
   try {
-    var data = await callGAS('getAllBorrowings');
+    var dataRaw = await callGAS('getAllBorrowings');
+    // [FIX] modal ini khusus "Seluruh Mahasiswa Aktif" — hanya tampilkan
+    // mahasiswa yang statusnya PERSIS 'aktif' di Rekap. Status kosong,
+    // 'lulus', atau nilai lain apapun tidak ikut ditampilkan.
+    var data = (dataRaw||[]).filter(function(b){
+      return (b.statusMahasiswa||'').toLowerCase().trim()==='aktif';
+    });
     if(!data||!data.length){
       if(tb) tb.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">Belum ada mahasiswa aktif</div></div></td></tr>';
       return;
@@ -175,9 +181,9 @@ function _renderDetailIdentitas(d) {
   el.innerHTML=
     '<div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;margin-bottom:20px;">'
       +'<div style="display:flex;flex-direction:column;align-items:center;gap:8px;">'
-        +'<div style="width:80px;height:80px;border-radius:50%;overflow:hidden;box-shadow:0 8px 24px rgba(26,86,219,0.25);">'
+        +'<div style="width:80px;height:80px;border-radius:50%;overflow:hidden;box-shadow:0 8px 24px rgba(37,99,235,0.25);">'
           +'<img src="assets/foto-profil-default.png" style="width:100%;height:100%;object-fit:cover;" '
-          +'onerror="this.parentElement.innerHTML=\'<div style=width:100%;height:100%;background:linear-gradient(135deg,#1a56db,#4a84ff);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;\'>'+initials+'</div>\'">'
+          +'onerror="this.parentElement.innerHTML=\'<div style=width:100%;height:100%;background:linear-gradient(135deg,#2563eb,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;\'>'+initials+'</div>\'">'
         +'</div>'
         +'<span class="badge '+bbc+'" style="font-size:10.5px;">'+esc(d.status_bebas||'Belum Bebas Lab')+'</span>'
       +'</div>'
@@ -198,7 +204,7 @@ function _renderDetailIdentitas(d) {
         +'<span class="badge '+sc+'">'+esc(sisa)+'</span>'
       +'</div>'
       +'<div style="background:#e2e8f0;border-radius:999px;height:8px;overflow:hidden;">'
-        +'<div style="height:100%;width:'+progress+'%;background:linear-gradient(90deg,#1a56db,#4a84ff);border-radius:999px;"></div>'
+        +'<div style="height:100%;width:'+progress+'%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:999px;"></div>'
       +'</div>'
       +'<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--muted);">'
         +'<span>'+esc(d.tanggalMulai||'—')+'</span>'
@@ -298,7 +304,7 @@ function _renderDetailBon(data) {
     +'</tr></thead><tbody>'+rows+'</tbody>'
     +'<tfoot><tr style="background:#dbeafe;">'
     +'<td colspan="8" style="text-align:right;padding:8px;font-weight:bold;font-size:12px;">TOTAL BIAYA</td>'
-    +'<td style="text-align:right;padding:8px;font-weight:bold;color:#1a56db;">Rp '+total.toLocaleString('id-ID')+'</td>'
+    +'<td style="text-align:right;padding:8px;font-weight:bold;color:#2563eb;">Rp '+total.toLocaleString('id-ID')+'</td>'
     +'</tr></tfoot></table></div>'
     +'<div style="font-size:12px;color:var(--muted);margin-top:8px;text-align:right;">Menampilkan <strong>'+filtered.length+'</strong> dari <strong>'+data.length+'</strong> entri</div>';
 }
@@ -386,17 +392,6 @@ function editStudentDetail() {
     return;
   }
 
-  function _extractNimPendek(nim) {
-    var s = (nim || '').toString().trim();
-    var m = s.match(/^\d{2}\/(\d{6})\//);
-    if (m) return m[1];
-    var m2 = s.match(/^\d{2}\/(\d{6})$/);
-    if (m2) return m2[1];
-    if (/^\d{6}$/.test(s)) return s;
-    if (/^\d{8}$/.test(s)) return s.substring(2, 8);
-    return s;
-  }
-
   function _parseToInputDate(str) {
     if (!str || str === '—' || str === '-') return '';
     var m = (str + '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -409,7 +404,7 @@ function editStudentDetail() {
     return '';
   }
 
-  var nimUntukEdit = _extractNimPendek(_detailNim);
+  var nimUntukEdit = _normalizeNimShort(_detailNim);
   openEditUser(nimUntukEdit, d.nama || '', 'Mahasiswa');
 
   var setVal = function(id, v) { var el = document.getElementById(id); if (el) el.value = v || ''; };
@@ -469,7 +464,7 @@ function printStudentFull(){
 function _triggerPrint(judul,content){
   var now=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
   var win=window.open('','_blank','width=900,height=700');
-  win.document.write('<!DOCTYPE html><html><head><title>'+judul+'</title><style>body{font-family:"Segoe UI",Arial,sans-serif;font-size:13px;color:#1e293b;margin:24px;}h1{font-size:17px;margin-bottom:2px;}h3{font-size:14px;color:#1a56db;border-bottom:2px solid #1a56db;padding-bottom:4px;}.meta{font-size:11px;color:#64748b;margin-bottom:16px;}table{width:100%;border-collapse:collapse;margin-bottom:16px;}th,td{border:1px solid #e2e8f0;padding:5px 8px;text-align:left;font-size:11px;}thead tr{background:#f1f5f9;}@media print{body{margin:10mm;}}</style></head><body>'
+  win.document.write('<!DOCTYPE html><html><head><title>'+judul+'</title><style>body{font-family:"Segoe UI",Arial,sans-serif;font-size:13px;color:#1e293b;margin:24px;}h1{font-size:17px;margin-bottom:2px;}h3{font-size:14px;color:#2563eb;border-bottom:2px solid #2563eb;padding-bottom:4px;}.meta{font-size:11px;color:#64748b;margin-bottom:16px;}table{width:100%;border-collapse:collapse;margin-bottom:16px;}th,td{border:1px solid #e2e8f0;padding:5px 8px;text-align:left;font-size:11px;}thead tr{background:#f1f5f9;}@media print{body{margin:10mm;}}</style></head><body>'
     +'<h1>'+judul+'</h1><div class="meta">Laboratorium Kimia &amp; Biokimia Pangan &nbsp;|&nbsp; Dicetak: '+now+'</div>'
     +'<hr style="border:none;border-top:2px solid #e2e8f0;margin-bottom:16px;">'+content+'</body></html>');
   win.document.close();
@@ -483,8 +478,33 @@ async function loadAdminStudentCards(){
   var el=document.getElementById('adminStudentList'); if(!el) return;
   el.innerHTML='<div style="display:flex;gap:10px;"><div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div><div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div><div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div><div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div><div class="skeleton" style="height:120px;flex:1;border-radius:12px;"></div></div>';
   try{
-    var data=await callGAS('getAllBorrowings');
+    // [FIX] Pakai getMahasiswaExternal() langsung — sumber yang sama dengan
+    // tabel daftar mahasiswa. getAllBorrowings() tidak dipakai di sini karena
+    // bergantung pada join NIM USERS↔Rekap, sehingga peneliti yang NIM-nya
+    // kosong atau belum terdaftar di USERS tidak akan pernah muncul di card.
+    var raw=await callGAS('getMahasiswaExternal');
+    var all=Array.isArray(raw)?raw:[];
+    var data=all.filter(function(d){
+      return (d.status||'').toLowerCase().trim()==='aktif';
+    });
     if(!data||!data.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Belum ada mahasiswa aktif.</div>';return;}
+
+    // Hitung sisa hari dari tanggalSelesai (format dd/MM/yyyy dari backend)
+    function _sisaCard(tglSelesai){
+      if(!tglSelesai||tglSelesai==='\u2014') return {label:'\u2014',sc:'b-gray'};
+      try{
+        var p=tglSelesai.split('/');
+        if(p.length!==3) return {label:tglSelesai,sc:'b-gray'};
+        var tgl=new Date(+p[2],p[1]-1,+p[0]);
+        var hari=Math.round((tgl-new Date())/86400000);
+        if(hari<0)   return {label:'Izin Penelitian Habis',sc:'b-red'};
+        if(hari===0) return {label:'Hari ini',sc:'b-amber'};
+        if(hari<=30) return {label:hari+' hari',sc:'b-amber'};
+        var bln=Math.floor(hari/30);
+        return {label:(bln>0?(bln+' bulan '+(hari%30)+' hari'):(hari+' hari')),sc:'b-green'};
+      }catch(ex){return {label:tglSelesai,sc:'b-gray'};}
+    }
+
     var pages=[],perPage=5;
     for(var p=0;p<data.length;p+=perPage) pages.push(data.slice(p,p+perPage));
     var currentPage=0;
@@ -492,29 +512,32 @@ async function loadAdminStudentCards(){
       currentPage=pageIdx;
       var items=pages[pageIdx], html='<div style="display:flex;gap:12px;flex-wrap:wrap;">';
       items.forEach(function(b){
-        var dosen=(b.dosenPembimbing&&b.dosenPembimbing!=='-')?b.dosenPembimbing:'—';
-        var judul=(b.judulPenelitian&&b.judulPenelitian!=='-')?b.judulPenelitian:'—';
-        var sisa=(b.sisaWaktu&&b.sisaWaktu!=='-')?b.sisaWaktu:'—', sc='b-green';
-        if(sisa==='Izin Penelitian Habis') sc='b-red';
-        else if(typeof b.sisaHari==='number'&&b.sisaHari<30) sc='b-amber';
-        html+='<div class="identity-card" style="flex:1 1 180px;min-width:0;max-width:260px;cursor:pointer;" '
-          +'onclick="loadStudentDetail(\''+esc(b.nim)+'\')" '
-          +'onmouseover="this.style.borderColor=\'var(--primary)\';this.style.boxShadow=\'0 4px 16px rgba(26,86,219,0.12)\'" '
-          +'onmouseout="this.style.borderColor=\'var(--border)\';this.style.boxShadow=\'\'">'
-          +'<div style="font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;">'+esc(b.nimLengkap||b.nim)+'</div>'
-          +'<div style="font-weight:800;font-size:14px;margin:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--primary);">'+esc(b.nama)+'</div>'
+        var dosen=(b.pembimbing&&b.pembimbing!=='\u2014')?b.pembimbing:'\u2014';
+        var judul=(b.judul&&b.judul!=='\u2014')?b.judul:'\u2014';
+        var nim=b.nim||'';
+        var sisa=_sisaCard(b.tanggalSelesai);
+        // Card bisa diklik hanya jika ada NIM; tanpa NIM tetap tampil tapi tidak bisa diklik detail
+        var cardStyle='flex:1 1 180px;min-width:0;max-width:260px;';
+        var cardClick=nim?('onclick="loadStudentDetail(\''+esc(nim)+'\')" style="'+cardStyle+'cursor:pointer;"')
+                         :('style="'+cardStyle+'cursor:default;opacity:0.85;"');
+        var hoverIn =nim?'this.style.borderColor=\'var(--primary)\';this.style.boxShadow=\'0 4px 16px rgba(37,99,235,0.12)\'':'';
+        var hoverOut=nim?'this.style.borderColor=\'var(--border)\';this.style.boxShadow=\'\'':'';
+        html+='<div class="identity-card" '+cardClick
+          +' onmouseover="'+hoverIn+'" onmouseout="'+hoverOut+'">'
+          +'<div style="font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;">'+(nim?esc(nim):'<span style="color:var(--danger);font-style:italic;">NIM tidak tersedia</span>')+'</div>'
+          +'<div style="font-weight:800;font-size:14px;margin:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--primary);">'+esc(b.nama||'\u2014')+'</div>'
           +'<div style="font-size:11.5px;color:var(--muted);margin-bottom:2px;"><i class="bi bi-person-workspace" style="margin-right:3px;"></i>'+esc(dosen)+'</div>'
           +'<div style="font-size:11px;font-style:italic;color:var(--muted);margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">'+esc(judul)+'</div>'
-          +'<div style="font-size:10.5px;color:var(--muted);margin-bottom:4px;"><i class="bi bi-calendar3" style="margin-right:3px;"></i>'+esc(b.tanggalMulai||'—')+' – '+esc(b.tanggalSelesai||'—')+'</div>'
-          +'<span class="badge '+sc+'" style="font-size:10px;">⏱ '+esc(sisa)+'</span>'
+          +'<div style="font-size:10.5px;color:var(--muted);margin-bottom:4px;"><i class="bi bi-calendar3" style="margin-right:3px;"></i>'+esc(b.tanggalMulai||'\u2014')+' \u2013 '+esc(b.tanggalSelesai||'\u2014')+'</div>'
+          +'<span class="badge '+sisa.sc+'" style="font-size:10px;">\u23f1 '+esc(sisa.label)+'</span>'
           +'</div>';
       });
       html+='</div>';
       if(pages.length>1){
         html+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;">';
-        html+='<button onclick="window._mhsCardPrev()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;'+(pageIdx===0?'opacity:0.3;':'')+'"><i class="bi bi-chevron-left"></i></button>';
+        html+='<button onclick="window._mhsCardPrev()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;'+(pageIdx===0?'opacity:0.3;':'')+'\"><i class=\"bi bi-chevron-left\"></i></button>';
         pages.forEach(function(_,i){html+='<div onclick="window._mhsCardGo('+i+')" style="width:8px;height:8px;border-radius:50%;background:'+(i===pageIdx?'var(--primary)':'#cbd5e1')+';cursor:pointer;"></div>';});
-        html+='<button onclick="window._mhsCardNext()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;'+(pageIdx===pages.length-1?'opacity:0.3;':'')+'"><i class="bi bi-chevron-right"></i></button>';
+        html+='<button onclick="window._mhsCardNext()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;'+(pageIdx===pages.length-1?'opacity:0.3;':'')+'\"><i class=\"bi bi-chevron-right\"></i></button>';
         html+='<span style="font-size:11px;color:var(--muted);">'+(pageIdx+1)+' / '+pages.length+'</span></div>';
       }
       el.innerHTML=html;
@@ -553,7 +576,7 @@ function _mkChart(canvasId, lbl, vals, c1, c2, oldInst){
 async function loadAdminCharts(){
   try{
     var res=await callGAS('getAnalyticsData');
-    cBahanInst=_mkChart('chartBahan',res.chem.labels,res.chem.values,'#1a56db','#93c5fd',cBahanInst);
+    cBahanInst=_mkChart('chartBahan',res.chem.labels,res.chem.values,'#2563eb','#93c5fd',cBahanInst);
     cAlatInst=_mkChart('chartAlat',res.tool.labels,res.tool.values,'#059669','#6ee7b7',cAlatInst);
     window._chartBahan = cBahanInst;
     window._chartAlat  = cAlatInst;
@@ -618,7 +641,7 @@ async function loadMhsExternalSummary(){
       if(ctx1&&tahunLabels.length){
         new Chart(ctx1.getContext('2d'),{
           type:'line',
-          data:{labels:tahunLabels,datasets:[{data:tahunVals,borderColor:'#1a56db',backgroundColor:'rgba(26,86,219,0.08)',borderWidth:2.5,pointBackgroundColor:'#1a56db',pointRadius:4,pointHoverRadius:6,tension:0.35,fill:true}]},
+          data:{labels:tahunLabels,datasets:[{data:tahunVals,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',borderWidth:2.5,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:6,tension:0.35,fill:true}]},
           options:{responsive:true,maintainAspectRatio:false,
             plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f172a',titleColor:'#f1f5f9',bodyColor:'#94a3b8',cornerRadius:8,callbacks:{label:function(c){return '  '+c.parsed.y+' mahasiswa';}}}},
             scales:{x:{grid:{display:false},ticks:{font:{size:11},color:'#64748b'}},y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:11},color:'#94a3b8',stepSize:1}}},
@@ -627,7 +650,7 @@ async function loadMhsExternalSummary(){
       }
       var ctx2=document.getElementById('chartMhsTujuan');
       if(ctx2){
-        var donutColors=['#1a56db','#059669','#7c3aed','#db2777','#94a3b8'];
+        var donutColors=['#2563eb','#059669','#7c3aed','#db2777','#94a3b8'];
         var donutLabels=['S1/Skripsi','S2/Tesis','S3/Disertasi','PKM','Lainnya'];
         var donutData=[s.s1,s.s2,s.s3,s.pkm,s.lainnya];
         var donutTotal=donutData.reduce(function(a,b){return a+b;},0);
@@ -733,6 +756,15 @@ async function loadMhsHistory(){
   }catch(e){}
 }
 
+/* ============================================================
+   BANNER BEBAS LAB (MAHASISWA)
+   ------------------------------------------------------------
+   FIX: pakai isKembaliOk/isLunasOk supaya mahasiswa yang memang
+   tidak pernah punya transaksi alat/bahan (status "Tidak Ada
+   Peminjaman"/"Tidak Ada Permintaan" hasil migrasi bon legacy)
+   tetap dianggap lolos pada checklist ini, bukan dianggap belum
+   beres.
+   ============================================================ */
 async function loadBebasLabBanner(){
   var el=document.getElementById('bebasLabBannerBody'); if(!el) return;
   try{
@@ -745,8 +777,8 @@ async function loadBebasLabBanner(){
     var sBL=myData?(myData.status_bebas||'Belum Bebas Lab'):'Belum Bebas Lab';
     function item(ok,label,note){var icon=ok?'✅':'❌',c=ok?'#059669':'#dc2626',bg=ok?'#f0fdf4':'#fff5f5',bd=ok?'#bbf7d0':'#fecaca';return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:'+bg+';border:1.5px solid '+bd+';border-radius:10px;"><span style="font-size:18px;">'+icon+'</span><div><div style="font-weight:700;font-size:13px;color:'+c+';">'+label+'</div><div style="font-size:12px;color:var(--muted);">'+esc(note)+'</div></div></div>';}
     var html='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">';
-    html+=item(alatKembali&&sK==='Sudah Kembali','Alat Dikembalikan',alatKembali?'Tidak ada alat yang masih dipinjam':'Masih ada alat yang belum dikembalikan');
-    html+=item(sB==='Lunas','Tagihan Lunas',sB==='Lunas'?'Tagihan bahan sudah lunas':'Tagihan bahan belum diselesaikan');
+    html+=item(alatKembali&&isKembaliOk(sK),'Alat Dikembalikan',alatKembali?'Tidak ada alat yang masih dipinjam':'Masih ada alat yang belum dikembalikan');
+    html+=item(isLunasOk(sB),'Tagihan Lunas',isLunasOk(sB)?'Tagihan bahan sudah lunas':'Tagihan bahan belum diselesaikan');
     html+=item(sBL==='Approved','Bebas Lab',sBL==='Approved'?'Bebas lab sudah disetujui admin':'Menunggu approval admin');
     html+='</div>';
     el.innerHTML=html;
@@ -790,8 +822,8 @@ async function loadBebasLabStatus(){
 
   var html='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">';
   html+=item(alatKembali,'Alat Dikembalikan',alatKembali?'Tidak ada alat yang masih dipinjam':'Masih ada alat yang belum dikembalikan');
-  var note2=sB==='Lunas'?'Tagihan bahan sudah lunas':(adaPending?'Sedang menunggu konfirmasi admin':'Belum mengajukan tagihan bahan');
-  html+=item(sB==='Lunas','Tagihan Lunas',note2);
+  var note2=isLunasOk(sB)?'Tagihan bahan sudah lunas':(adaPending?'Sedang menunggu konfirmasi admin':'Belum mengajukan tagihan bahan');
+  html+=item(isLunasOk(sB),'Tagihan Lunas',note2);
   html+=item(sBL==='Approved','Bebas Lab',sBL==='Approved'?'Bebas lab sudah disetujui admin':'Menunggu approval admin');
   html+='</div>';
 
@@ -842,7 +874,7 @@ function filterMhsExt(){
   var status=((document.getElementById('filterStatusMhsExt')||{}).value||'').toLowerCase().trim();
   var tahun=((document.getElementById('filterTahunMhsExt')||{}).value||'').trim();
   _mhsExtFiltered=_mhsExtData.filter(function(d){
-    if((d.status||'').toLowerCase()==='lulus') return false;
+    if((d.status||'').toLowerCase()!=='aktif') return false;
     if(status&&(d.status||'').toLowerCase()!==status) return false;
     if(tahun&&(d.tahun||'').toString()!==tahun) return false;
     if(_filterMhsTujuan&&(d.tujuan||'')!==_filterMhsTujuan) return false;
@@ -923,7 +955,7 @@ function _mhsExtTh(label,hasFilter,fKey,fVals){
   if(!hasFilter||!fKey||!fVals||!fVals.length) return '<th style="white-space:nowrap;">'+esc(label)+'</th>';
   var cur=_getMhsFilterVal(fKey),isActive=cur!=='';
   var icFunnel=isActive?'bi-funnel-fill':'bi-funnel';
-  var btnStyle=isActive?'background:rgba(26,86,219,0.12);color:var(--primary);':'background:transparent;color:#94a3b8;';
+  var btnStyle=isActive?'background:rgba(37,99,235,0.12);color:var(--primary);':'background:transparent;color:#94a3b8;';
   return '<th style="white-space:nowrap;"><span style="display:inline-flex;align-items:center;gap:3px;">'+esc(label)
     +'<button class="inv-filter-btn" style="'+btnStyle+'" onclick="openMhsExtDrop(event,\''+fKey+'\',this)" title="Filter '+esc(label)+'">'
     +'<i class="bi '+icFunnel+'" style="font-size:11px;pointer-events:none;"></i></button></span></th>';
@@ -1081,7 +1113,7 @@ async function loadSurveiTren() {
     // Chart
     var chartHtml = '<div style="position:relative;height:220px;"><canvas id="chartSurveiTren"></canvas></div>'
       + '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:10.5px;color:#64748b;">'
-      + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:3px;background:#1a56db;display:inline-block;border-radius:2px;"></span>Rata-rata</span>'
+      + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:3px;background:#2563eb;display:inline-block;border-radius:2px;"></span>Rata-rata</span>'
       + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#ef4444;display:inline-block;border-radius:2px;border:1px dashed #ef4444;"></span>P1 Pelayanan</span>'
       + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#f97316;display:inline-block;border-radius:2px;border:1px dashed #f97316;"></span>P2 Bahan</span>'
       + '<span style="display:flex;align-items:center;gap:4px;"><span style="width:20px;height:2px;background:#8b5cf6;display:inline-block;border-radius:2px;border:1px dashed #8b5cf6;"></span>P3 Peralatan</span>'
@@ -1115,7 +1147,7 @@ async function loadSurveiTren() {
         data: {
           labels: labels,
           datasets: [
-            makeDataset('Rata-rata', avgKeseluruhan, '#1a56db', false),
+            makeDataset('Rata-rata', avgKeseluruhan, '#2563eb', false),
             makeDataset('P1 Pelayanan', avgP1, '#ef4444', true),
             makeDataset('P2 Bahan', avgP2, '#f97316', true),
             makeDataset('P3 Peralatan', avgP3, '#8b5cf6', true),

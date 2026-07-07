@@ -7,7 +7,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbw2uwyJg_6R3nl4aRgZ8GPy
 /* ============================================================
    GLOBAL STATE
    ============================================================ */
-var _user = '', _uname = '', _role = '';
+var _user = '', _uname = '', _role = '', _foto = '';
 var _chemData = [], _toolData = [];
 var _stokItemNama = '', _stokType = '';
 var _kbNim = '', _kbAlatNama = '', _kbAlatJml = 0;
@@ -53,6 +53,7 @@ function _saveSession() {
     user : _user,
     uname: _uname,
     role : _role,
+    foto : _foto,
     token: _token,
     exp  : Date.now() + SESSION_EXPIRY   // ← pakai variable, bukan hardcode
   };
@@ -73,6 +74,7 @@ function _loadSession() {
     _user  = d.user  || '';
     _uname = d.uname || '';
     _role  = d.role  || '';
+    _foto  = d.foto  || '';   // ← foto profil (Dosen/Admin/PLP)
     _token = d.token || '';   // ← tambahkan baris ini
     /* Perpanjang expiry selama user masih aktif */
     _saveSession();

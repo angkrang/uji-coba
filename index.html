@@ -9,7 +9,7 @@
        PWA — Manifest & Ikon
        ============================================================ -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1a56db">
+  <meta name="theme-color" content="#2563eb">
   <meta name="description" content="Sistem Informasi Inventaris Laboratorium Kimia dan Biokimia Pangan dan Hasil Pertanian">
 
   <!-- Favicon -->
@@ -66,15 +66,15 @@
           },
           colors: {
             brand: {
-              50:'#eef4ff', 100:'#dce9ff', 200:'#b9d3ff', 300:'#82afff',
-              400:'#4a84ff', 500:'#1a56db', 600:'#1245b8', 700:'#0f3896',
+              50:'#eff6ff', 100:'#dce9ff', 200:'#b9d3ff', 300:'#82afff',
+              400:'#3b82f6', 500:'#2563eb', 600:'#1d4ed8', 700:'#1d4ed8',
               800:'#0c2d7a', 900:'#0a2260',
             },
             slate: { 850:'#1a2234', 950:'#0a0f1e' }
           },
           boxShadow: {
-            'glow':    '0 0 20px rgba(26,86,219,0.15)',
-            'glow-lg': '0 0 40px rgba(26,86,219,0.2)',
+            'glow':    '0 0 20px rgba(37,99,235,0.15)',
+            'glow-lg': '0 0 40px rgba(37,99,235,0.2)',
             'card':    '0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04)',
           },
           animation: {
@@ -125,7 +125,7 @@
 <div id="loginPage">
   <div class="login-card">
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="width:56px;height:56px;background:linear-gradient(135deg,#1a56db,#4a84ff);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 24px rgba(26,86,219,0.3);">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#2563eb,#3b82f6);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 24px rgba(37,99,235,0.3);">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0l-3 6h12l-3-6M9 14h6"/>
         </svg>
@@ -154,7 +154,7 @@
     <!-- ── Petunjuk Login ── -->
 <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
   <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
-    <i class="bi bi-info-circle-fill" style="color:#1a56db;font-size:15px;"></i>
+    <i class="bi bi-info-circle-fill" style="color:#2563eb;font-size:15px;"></i>
     <span style="font-size:12.5px;font-weight:700;color:#1e3a8a;">Petunjuk Login Mahasiswa</span>
   </div>
 
@@ -332,7 +332,7 @@
       </svg>
     </button>
     <!-- Logo -->
-    <div style="width:30px;height:30px;min-width:30px;background:linear-gradient(135deg,#1a56db,#4a84ff);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+    <div style="width:30px;height:30px;min-width:30px;background:linear-gradient(135deg,#2563eb,#3b82f6);border-radius:8px;display:flex;align-items:center;justify-content:center;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0l-3 6h12l-3-6M9 14h6"/>
       </svg>
@@ -355,7 +355,7 @@
     </div>
     <!-- Avatar -->
     <div onclick="toggleSidebar()"
-         style="width:34px;height:34px;min-width:34px;border-radius:50%;background:linear-gradient(135deg,#1a56db,#4a84ff);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.15);cursor:pointer;"
+         style="width:34px;height:34px;min-width:34px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.15);cursor:pointer;"
          id="mtAvatar">U</div>
   </div>
 </div>
@@ -426,7 +426,7 @@
           <div class="stat-icon" style="background:#fef3c7;color:#92400e;"><i class="bi bi-receipt"></i></div>
           <div class="stat-val" id="st-pay">—</div>
           <div class="stat-label">Tagihan menunggu konfirmasi</div>
-          <a class="stat-action" id="statPayAction" onclick="goTo('pay')" style="color:#d97706;">Proses sekarang <i class="bi bi-arrow-right"></i></a>
+          <a class="stat-action" id="statPayAction" onclick="goTo('pay')" style="color:#f97316;">Proses sekarang <i class="bi bi-arrow-right"></i></a>
         </div>
       </div>
 
@@ -612,24 +612,24 @@
             <circle cx="65" cy="65" r="52" fill="none" stroke="#E6F1FB" stroke-width="13"/>
             <!-- Fill luar (total terpakai) — dasharray diupdate JS -->
             <circle id="donutOuter" cx="65" cy="65" r="52" fill="none"
-                    stroke="#1a56db" stroke-width="13"
+                    stroke="#2563eb" stroke-width="13"
                     stroke-dasharray="0 327" stroke-dashoffset="82"
                     stroke-linecap="round"/>
             <!-- Track dalam -->
             <circle cx="65" cy="65" r="33" fill="none" stroke="#FFFBEB" stroke-width="9"/>
             <!-- Fill dalam (fase aktif) -->
             <circle id="donutInner" cx="65" cy="65" r="33" fill="none"
-                    stroke="#d97706" stroke-width="9"
+                    stroke="#f97316" stroke-width="9"
                     stroke-dasharray="0 207" stroke-dashoffset="52"
                     stroke-linecap="round"/>
             <text id="donutPct" x="65" y="60" text-anchor="middle"
-                  font-size="17" font-weight="700" fill="#1a56db">—%</text>
+                  font-size="17" font-weight="700" fill="#2563eb">—%</text>
             <text x="65" y="75" text-anchor="middle"
                   font-size="10" fill="#888780">terpakai</text>
           </svg>
           <div class="db-donut-legend">
-            <span><span class="db-legend-dot" style="background:#1a56db;"></span>Total</span>
-            <span><span class="db-legend-dot" style="background:#d97706;"></span>Aktif</span>
+            <span><span class="db-legend-dot" style="background:#2563eb;"></span>Total</span>
+            <span><span class="db-legend-dot" style="background:#f97316;"></span>Aktif</span>
           </div>
         </div>
         <!-- Stat ringkas -->
@@ -640,11 +640,11 @@
           </div>
           <div class="db-tracker-stat">
             <span class="db-tstat-label">Terpakai</span>
-            <span class="db-tstat-value" id="trackerUsed" style="color:#1a56db;">— hari</span>
+            <span class="db-tstat-value" id="trackerUsed" style="color:#2563eb;">— hari</span>
           </div>
           <div class="db-tracker-stat">
             <span class="db-tstat-label">Sisa waktu</span>
-            <span class="db-tstat-value" id="trackerLeft" style="color:#d97706;">— hari</span>
+            <span class="db-tstat-value" id="trackerLeft" style="color:#f97316;">— hari</span>
           </div>
           <div class="db-tracker-stat">
             <span class="db-tstat-label">Fase aktif</span>
@@ -720,16 +720,16 @@
         <div id="dsnJenjangBreakdown" style="display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 16px;"></div>
         <table class="tbl" style="border-collapse:collapse;">
           <thead><tr>
-            <th style="border:1px solid var(--border,#e2e8f0);">NIM</th>
-            <th style="border:1px solid var(--border,#e2e8f0);">Nama</th>
-            <th style="border:1px solid var(--border,#e2e8f0);min-width:280px;width:32%;">Judul Penelitian</th>
-            <th style="border:1px solid var(--border,#e2e8f0);">Jenjang</th>
-            <th style="border:1px solid var(--border,#e2e8f0);">Mulai Ijin</th>
-            <th style="border:1px solid var(--border,#e2e8f0);">Akhir Ijin</th>
-            <th style="border:1px solid var(--border,#e2e8f0);">Sisa Waktu</th>
-            <th style="border:1px solid var(--border,#e2e8f0);">Jumlah Sesi</th>
-            <th style="border:1px solid var(--border,#e2e8f0);">Kendala Aktif</th>
-            <th style="border:1px solid var(--border,#e2e8f0);"></th>
+            <th style="border:1px solid var(--border,#e2e8f0);width:9%;">NIM</th>
+            <th style="border:1px solid var(--border,#e2e8f0);width:13%;">Nama</th>
+            <th style="border:1px solid var(--border,#e2e8f0);min-width:220px;width:28%;">Judul Penelitian</th>
+            <th style="border:1px solid var(--border,#e2e8f0);width:7%;">Jenjang</th>
+            <th style="border:1px solid var(--border,#e2e8f0);width:7%;">Mulai Ijin</th>
+            <th style="border:1px solid var(--border,#e2e8f0);width:7%;">Akhir Ijin</th>
+            <th style="border:1px solid var(--border,#e2e8f0);width:7%;">Sisa Waktu</th>
+            <th style="border:1px solid var(--border,#e2e8f0);width:8%;">Jumlah Sesi</th>  <!-- <th style="border:1px solid var(--border,#e2e8f0);width:8%;white-space:nowrap;">Jumlah Sesi</th> -->
+            <th style="border:1px solid var(--border,#e2e8f0);width:8%;">Kendala Aktif</th>
+            <th style="border:1px solid var(--border,#e2e8f0);width:6%;"></th>
           </tr></thead>
           <tbody id="dsnMhsBody"><tr><td colspan="10" style="border:1px solid var(--border,#e2e8f0);"><div class="empty-state"><div class="empty-state-title">Memuat data...</div></div></td></tr></tbody>
         </table>
@@ -745,7 +745,7 @@
         </table>
       </div>
 
-      <div class="card">
+      <div class="card" id="dsnFormCard">
         <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
           <h3>Catat Sesi Bimbingan</h3>
         </div>
@@ -757,20 +757,61 @@
           <div><label class="form-label">Durasi (menit)</label>
             <input type="number" id="dsnFormDurasi" class="form-control" placeholder="60"></div>
           <div><label class="form-label">Topik / Catatan</label>
-            <input type="text" id="dsnFormTopik" class="form-control" placeholder="Pembahasan bab 3, dst."></div>
-          <div style="grid-column:1/-1;"><label class="form-label">Kendala (kosongkan jika tidak ada)</label>
+            <input type="text" id="dsnFormTopik" class="form-control" placeholder="Pembahasan bab 3, analisis data, dst."></div>
+          <div style="grid-column:1/-1;"><label class="form-label">Kendala <span style="color:var(--muted);font-weight:400;">(kosongkan jika tidak ada)</span></label>
             <textarea id="dsnFormKendala" class="form-control" rows="2" placeholder="Mis: kesulitan analisis data, alat rusak, dll."></textarea></div>
         </div>
         <button class="btn btn-primary" onclick="submitBimbinganLog()"><i class="bi bi-save"></i> Simpan Sesi Bimbingan</button>
       </div>
 
       <div class="card" style="margin-top:20px;">
-        <div class="card-header"><h3>Riwayat Semua Sesi</h3></div>
-        <table class="tbl">
-          <thead><tr><th>Tanggal</th><th>Mahasiswa</th><th>Durasi</th><th>Topik</th><th>Kendala</th><th>Status</th></tr></thead>
-          <tbody id="dsnRiwayatBody"><tr><td colspan="6"><div class="empty-state"><div class="empty-state-title">Belum ada riwayat</div></div></td></tr></tbody>
-        </table>
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <h3 style="margin:0;">Riwayat Semua Sesi</h3>
+          <input type="text" id="dsnSearchRiwayat" class="form-control" style="max-width:240px;font-size:13px;"
+            placeholder="Cari mahasiswa / topik…" oninput="filterDosenRiwayat()">
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr>
+              <th>Tanggal</th><th>Mahasiswa</th><th>Durasi</th>
+              <th>Topik</th><th>Kendala</th><th>Status</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="dsnRiwayatBody"><tr><td colspan="7"><div class="empty-state"><div class="empty-state-title">Belum ada riwayat</div></div></td></tr></tbody>
+          </table>
+        </div>
       </div>
+
+      <!-- Modal Edit Sesi Bimbingan -->
+      <div id="dsnEditModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;">
+        <div style="background:var(--surface,#fff);border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+            <h3 style="margin:0;font-size:16px;">Edit Sesi Bimbingan</h3>
+            <button onclick="closeDsnEditModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);">&times;</button>
+          </div>
+          <div id="dsnEditMhsLabel" style="font-size:13px;color:var(--muted);margin-bottom:14px;"></div>
+          <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+            <div><label class="form-label">Tanggal</label>
+              <input type="date" id="dsnEditTanggal" class="form-control"></div>
+            <div><label class="form-label">Durasi (menit)</label>
+              <input type="number" id="dsnEditDurasi" class="form-control" placeholder="60"></div>
+            <div style="grid-column:1/-1;"><label class="form-label">Topik / Catatan</label>
+              <input type="text" id="dsnEditTopik" class="form-control"></div>
+            <div style="grid-column:1/-1;"><label class="form-label">Kendala</label>
+              <textarea id="dsnEditKendala" class="form-control" rows="2"></textarea></div>
+            <div style="grid-column:1/-1;"><label class="form-label">Status Kendala</label>
+              <select id="dsnEditStatusKendala" class="form-control">
+                <option value="">Tanpa Kendala</option>
+                <option value="Open">Open (Aktif)</option>
+                <option value="Selesai">Selesai</option>
+              </select></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:18px;">
+            <button class="btn btn-primary" style="flex:1;" onclick="submitDsnEdit()"><i class="bi bi-save"></i> Simpan Perubahan</button>
+            <button class="btn btn-outline" onclick="closeDsnEditModal()">Batal</button>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /sec-dosen -->
 
     <!-- ======================================================
@@ -985,8 +1026,8 @@
         </div>
         <div class="tbl-wrap">
           <table class="tbl">
-            <thead><tr><th>Username / NIM</th><th>Nama Lengkap</th><th>Role</th><th>Aksi</th></tr></thead>
-            <tbody id="tbUser"><tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">👤</div><div class="empty-state-title">Memuat data user...</div></div></td></tr></tbody>
+            <thead><tr><th style="width:56px;">Foto</th><th>Username / NIM</th><th>Nama Lengkap</th><th>Role</th><th>Aksi</th></tr></thead>
+            <tbody id="tbUser"><tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">👤</div><div class="empty-state-title">Memuat data user...</div></div></td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1004,6 +1045,10 @@
           <div class="export-card" onclick="triggerExport('inventaris_bahan')"><i class="bi bi-droplet-half" style="font-size:28px;color:var(--primary);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Inventaris Bahan</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Stok, status, lokasi, harga</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
           <div class="export-card" onclick="triggerExport('inventaris_alat')"><i class="bi bi-tools" style="font-size:28px;color:var(--success);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Inventaris Alat</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Jumlah, kondisi, kategori</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
           <div class="export-card" onclick="triggerExport('peminjaman')"><i class="bi bi-clipboard-check" style="font-size:28px;color:var(--warning);display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Rekap Peminjaman</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Status &amp; bebas lab</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
+        </div>
+        <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">Data Mahasiswa</div>
+        <div class="grid-3" style="margin-bottom:20px;">
+          <div class="export-card" onclick="triggerExport('mahasiswa_aktif')"><i class="bi bi-mortarboard" style="font-size:28px;color:#7c3aed;display:block;margin-bottom:8px;"></i><div style="font-weight:700;font-size:13px;margin-bottom:4px;">Daftar Mahasiswa Aktif</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;">NIM, judul, jenjang, pembimbing &amp; akhir ijin penelitian</div><div style="display:flex;gap:5px;justify-content:center;"><span class="badge b-blue">Excel</span><span class="badge b-red">PDF</span></div></div>
         </div>
         <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">Riwayat &amp; Log</div>
         <div class="grid-3">
@@ -1582,9 +1627,10 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
         <div><label class="form-label">Username / NIM <span style="color:var(--danger);">*</span></label><input type="text" id="uUsername" class="form-control" placeholder="cth: 20230001"></div>
         <div><label class="form-label">Nama Lengkap <span style="color:var(--danger);">*</span></label><input type="text" id="uNama" class="form-control" placeholder="Nama lengkap pengguna"></div>
-        <div><label class="form-label">Role <span style="color:var(--danger);">*</span></label><select id="uRole" class="form-select" onchange="toggleStudentFields()"><option value="Mahasiswa">Mahasiswa</option><option value="Admin">Admin</option><option value="Dosen">Dosen</option></select></div>
+        <div><label class="form-label">Role <span style="color:var(--danger);">*</span></label><select id="uRole" class="form-select" onchange="toggleStudentFields()"><option value="Mahasiswa">Mahasiswa</option><option value="Admin">Admin</option><option value="PLP">PLP</option><option value="Dosen">Dosen</option></select></div>
         <div id="uPassWrap"><label class="form-label">Password <span style="color:var(--danger);">*</span></label><input type="text" id="uPass" class="form-control" placeholder="Password awal untuk login"></div>
         <div id="uResetWrap" class="hidden"><label class="form-label">Password Baru</label><div style="display:flex;gap:6px;"><input type="text" id="uNewPass" class="form-control" placeholder="Kosongkan jika tidak diubah"><button class="btn btn-outline btn-sm" onclick="doResetPass()">Reset</button></div></div>
+        <div id="staffFotoWrap" class="hidden" style="grid-column:1/-1;"><label class="form-label">URL Foto Profil (opsional)</label><input type="text" id="uFoto" class="form-control" placeholder="https://... tautan foto profil"></div>
       </div>
       <div id="studentFields" class="hidden">
         <div class="divider"></div>
@@ -1674,6 +1720,29 @@ document.addEventListener('click', function(e) {
 });
 </script>
 <div id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+<!-- MODAL UBAH FOTO PROFIL (Admin) -->
+<div id="mdlUbahFotoAdmin" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlUbahFotoAdmin')">
+  <div class="modal-box modal-w-sm">
+    <div class="modal-head">
+      <h5><i class="bi bi-camera-fill" style="color:var(--primary);margin-right:8px;"></i><span id="adminFotoTitle">Ubah Foto Profil</span></h5>
+      <button class="modal-close" onclick="closeModal('mdlUbahFotoAdmin')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div style="text-align:center;margin:16px 0 20px;">
+      <div id="adminFotoPreview" style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff;margin:0 auto 14px;overflow:hidden;border:3px solid var(--border);"></div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label class="form-label">URL Foto Profil</label>
+      <input type="url" id="adminFotoUrl" class="form-control" placeholder="https://..." oninput="_previewAdminFoto(this.value)">
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">Gunakan tautan gambar dari Google Drive, Imgur, atau hosting lain. Pastikan link dapat diakses publik.</div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('mdlUbahFotoAdmin')">Batal</button>
+      <button class="btn btn-primary" onclick="saveUbahFotoAdmin()"><i class="bi bi-check2"></i> Simpan Foto</button>
+    </div>
+  </div>
+</div>
+
 </div>
 
 <!-- ============================================================

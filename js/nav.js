@@ -34,21 +34,25 @@ function setActive(navId) {
 
 function _roleLabel() {
   if (_role === 'admin') return 'Administrator';
+  if (_role === 'plp') return 'PLP';
   if (_role === 'dosen') return 'Dosen';
   return 'Mahasiswa';
 }
 
 function _applyRoleUI() {
   var initials = _user ? _user.charAt(0).toUpperCase() : 'U';
-  var ua=document.getElementById('userAvatar'); if(ua) ua.textContent=initials;
+  // Foto profil asli untuk Admin/PLP/Dosen; Mahasiswa pakai foto default bulat
+  var avatarFoto = (_role === 'admin' || _role === 'plp' || _role === 'dosen') ? _foto : 'assets/foto-profil-default.png';
+  var avatarHtml = _avatarHtml(initials, avatarFoto);
+  var ua=document.getElementById('userAvatar'); if(ua) ua.innerHTML=avatarHtml;
   var ucn=document.getElementById('userChipName'); if(ucn) ucn.textContent=_user;
   var ucr=document.getElementById('userChipRole'); if(ucr) ucr.textContent=_roleLabel();
-  var sa=document.getElementById('sidebarAvatar'); if(sa) sa.textContent=initials;
+  var sa=document.getElementById('sidebarAvatar'); if(sa) sa.innerHTML=avatarHtml;
   var sun=document.getElementById('sidebarUserName'); if(sun) sun.textContent=_user;
   var sur=document.getElementById('sidebarUserRole'); if(sur) sur.textContent=_roleLabel();
   var sr=document.getElementById('sidebarRole'); if(sr) sr.textContent=_roleLabel();
   var mtn=document.getElementById('mtName'); if(mtn) mtn.textContent=_user;
-  var mta=document.getElementById('mtAvatar'); if(mta) mta.textContent=initials;
+  var mta=document.getElementById('mtAvatar'); if(mta) mta.innerHTML=avatarHtml;
 
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appWrap').classList.remove('hidden'); // FIX: tampilkan kembali mobile topbar setiap kali user berhasil login
@@ -56,14 +60,16 @@ function _applyRoleUI() {
 
   resetAllNavVisibility();
 
-  if (_role === 'admin') {
+  if (_role === 'admin' || _role === 'plp') {
+    // Admin & PLP: menu identik (PLP diperlakukan sama seperti Admin)
     ['ni-mhs-ext','ni-inv','ni-pem','ni-pay','ni-user','ni-export','ni-audit','ni-maint','ni-waste','nl-admin-label']
       .forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('hidden'); });
     var niReq=document.getElementById('ni-req'); if(niReq) niReq.classList.add('hidden');
     var niRet=document.getElementById('ni-ret'); if(niRet) niRet.classList.add('hidden');
   } else if (_role === 'dosen') {
-    // Dosen: tampilan menu SAMA dengan admin, ditambah menu "Bimbingan Saya"
-    ['ni-mhs-ext','ni-inv','ni-pem','ni-pay','ni-user','ni-export','ni-audit','ni-maint','ni-waste','nl-admin-label','ni-dosen']
+    // Dosen: tampilan menu seperti admin, TANPA Tagihan Bahan, Peminjaman Alat,
+    // dan Kelola User — ditambah menu "Bimbingan Saya"
+    ['ni-mhs-ext','ni-inv','ni-export','ni-audit','ni-maint','ni-waste','nl-admin-label','ni-dosen']
       .forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('hidden'); });
     var niReq2=document.getElementById('ni-req'); if(niReq2) niReq2.classList.add('hidden');
     var niRet2=document.getElementById('ni-ret'); if(niRet2) niRet2.classList.add('hidden');
@@ -71,7 +77,7 @@ function _applyRoleUI() {
     ['ni-req','ni-ret','ni-pay','ni-inv'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('hidden'); });
     var niMhsExt=document.getElementById('ni-mhs-ext'); if(niMhsExt) niMhsExt.classList.add('hidden');
   }
-  // Survei Kepuasan: tampil untuk Admin maupun Mahasiswa, kontennya beda (lihat survei.js)
+  // Survei Kepuasan: tampil untuk Admin, PLP, maupun Mahasiswa, kontennya beda (lihat survei.js)
   // (Dosen belum punya halaman survei — sengaja tidak ditampilkan untuk role dosen)
   if (_role !== 'dosen') {
     ['ni-survei','nl-survei-label'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('hidden'); });
@@ -135,8 +141,8 @@ function goTo(sec) {
   var mt=document.getElementById('mtTitle'); if(mt) mt.textContent=titleMap[sec]||'Dashboard';
 
   if (sec === 'dash') {
-    if (_role === 'admin' || _role === 'dosen') {
-      // Dosen: dashboard utama dibuat sama persis dengan tampilan admin
+    if (_role === 'admin' || _role === 'dosen' || _role === 'plp') {
+      // Dosen & PLP: dashboard utama dibuat sama persis dengan tampilan admin
       var el = document.getElementById('sec-dash-admin'); if(el) el.classList.remove('hidden');
       loadAdminDash();
     } else {
@@ -170,7 +176,7 @@ function goTo(sec) {
 
   } else if (sec === 'pay') {
     var el = document.getElementById('sec-pay'); if(el) el.classList.remove('hidden');
-    if (_role === 'admin' || _role === 'dosen') {
+    if (_role === 'admin' || _role === 'dosen' || _role === 'plp') {
       document.getElementById('pay-mhs-view').classList.add('hidden');
       document.getElementById('pay-admin-view').classList.remove('hidden');
       loadAdminPayRequests();
@@ -258,12 +264,13 @@ async function doLogin() {
       _user  = res.nama;
       _uname = res.username;
       _role  = (res.role||'').toLowerCase();
+      _foto  = res.foto || res.fotoUrl || res.photo || '';
       _saveSession();
       _applyRoleUI();
       hideAllSec();
       _chemData=[]; _toolData=[]; _hargaMap={};
       goTo('dash');
-      if (_role === 'admin' || _role === 'dosen') refreshNavBadges();
+      if (_role === 'admin' || _role === 'plp') refreshNavBadges();
     } else {
       Swal.fire({ icon:'error', title:'Login Gagal', text:'Username atau password salah. Periksa kembali data Anda.' });
     }
@@ -278,7 +285,7 @@ async function doLogin() {
 async function doLogout() {           // ← ubah jadi async
   await callGAS('logoutUser', {});    // ← tambahkan baris ini: hapus token di server
   _clearSession();
-  _user=''; _uname=''; _role=''; _token='';   // ← tambahkan _token='' di sini
+  _user=''; _uname=''; _role=''; _token=''; _foto='';   // ← tambahkan _token='' di sini
   _chemData=[]; _toolData=[]; _hargaMap={};
   _stokItemNama=''; _stokType='';
   _kbNim=''; _kbAlatNama=''; _kbAlatJml=0;

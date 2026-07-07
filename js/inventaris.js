@@ -54,7 +54,7 @@ function _closeInvDrop() {
 async function loadInv() {
   _initInvDrop();
 
-  if (_role === 'admin') {
+  if (_role === 'admin' || _role === 'plp') {
     document.getElementById('btnAddBahanWrap').classList.remove('hidden');
     document.getElementById('btnAddAlatWrap').classList.remove('hidden');
   } else {
@@ -110,7 +110,7 @@ function _rowBahan(item) {
   var hargaTxt = (item.harga > 0)
     ? '<div style="font-size:11px;color:var(--muted);">' + formatRupiah(item.harga) + '/' + esc(item.satuan) + '</div>'
     : '';
-  var aksi = _role === 'admin'
+  var aksi = (_role === 'admin' || _role === 'plp')
     ? '<button class="btn btn-xs btn-outline" style="color:var(--primary);border-color:var(--primary);" onclick="openStokModal(\'bahan\',' + idx + ')"><i class="bi bi-pencil"></i> Stok</button>'
     : '';
 
@@ -131,7 +131,7 @@ function _rowAlat(item) {
   if (st.includes('habis') || st.includes('stok minim')) sc = 'b-red';
   else if (st.includes('jumlah terbatas'))               sc = 'b-amber';
 
-  var aksi = _role === 'admin'
+  var aksi = (_role === 'admin' || _role === 'plp')
     ? '<button class="btn btn-xs btn-outline" style="color:var(--success);border-color:var(--success);" onclick="openStokModal(\'alat\',' + idx + ')"><i class="bi bi-pencil"></i> Stok</button>'
     : '';
   var katHtml = item.kategori
@@ -247,7 +247,7 @@ function _buildTh(col, sortState, type) {
     var isActive2 = cur !== '';
     var icFunnel = isActive2 ? 'bi-funnel-fill' : 'bi-funnel';
     var btnStyle = isActive2
-      ? 'background:rgba(26,86,219,0.12);color:var(--primary);'
+      ? 'background:rgba(37,99,235,0.12);color:var(--primary);'
       : 'background:transparent;color:#94a3b8;';
     filterHtml = ' <button class="inv-filter-btn" '
       + 'style="' + btnStyle + '" '
