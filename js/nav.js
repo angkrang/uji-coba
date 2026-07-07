@@ -36,8 +36,10 @@ function _firstName(nama) {
   if (!nama) return '';
   var titles = /^(dr|drs|dra|prof|ir|hj|h)\.?$/i;
   var parts = nama.trim().split(/\s+/);
-  if (parts.length > 1 && titles.test(parts[0])) return parts[0] + ' ' + parts[1];
-  return parts[0] || '';
+  var kept = [];
+  while (parts.length > 1 && titles.test(parts[0])) kept.push(parts.shift());
+  if (!kept.length) return parts[0] || '';
+  return kept.join(' ') + ' ' + parts[0];
 }
 
 function _updateHeroGreeting() {
