@@ -193,7 +193,7 @@ function _openDenahModal(meja, posisi) {
 
   var isAdmin = (_role === 'admin' || _role === 'plp');
   var mejaLabel = (DNH_TABLES.filter(function (t) { return t.id === meja; })[0] || {}).label || meja;
-  var sisiLabel = (posisi.charAt(0) === 'a' ? 'Sisi Atas' : 'Sisi Bawah') + ' — Stasiun ' + posisi.charAt(1);
+  var sisiLabel = (posisi.charAt(0) === 'a' ? 'Sisi Barat' : 'Sisi Timur') + ' — Stasiun ' + posisi.charAt(1);
 
   document.getElementById('dnm-title').textContent = 'Stasiun ' + d.kode;
   document.getElementById('dnm-kode').textContent = d.kode;
