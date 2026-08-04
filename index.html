@@ -97,6 +97,8 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/style-mobile.css">
   <link rel="stylesheet" href="css/style-patch.css">
+  <link rel="stylesheet" href="css/loker.css">
+  <link rel="stylesheet" href="css/denah.css">
 </head>
 <body>
 
@@ -279,6 +281,18 @@
       <div class="nav-item-wrap hidden" id="ni-survei">
         <a class="nav-link" id="nl-survei" onclick="goTo('survei')">
           <i class="bi bi-emoji-smile"></i> Survei Kepuasan
+        </a>
+      </div>
+
+      <div class="nav-item-wrap hidden" id="ni-loker">
+        <a class="nav-link" id="nl-loker" onclick="goTo('loker')">
+          <i class="bi bi-grid-3x3-gap"></i> Loker
+        </a>
+      </div>
+
+      <div class="nav-item-wrap hidden" id="ni-denah">
+        <a class="nav-link" id="nl-denah" onclick="goTo('denah')">
+          <i class="bi bi-table"></i> Denah Meja
         </a>
       </div>
 
@@ -890,14 +904,20 @@
   <div id="rp-req">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
       <div class="card" style="margin-bottom:0;">
-        <div class="card-title"><i class="bi bi-droplet-half" style="color:var(--primary);margin-right:8px;"></i>Minta Bahan Kimia</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;"><i class="bi bi-droplet-half" style="color:var(--primary);margin-right:8px;"></i>Minta Bahan Kimia</div>
+          <button class="btn btn-outline btn-sm" onclick="openOcrModal('bahan')" title="Isi otomatis dari foto kartu bon"><i class="bi bi-camera"></i> Scan Kartu Bon</button>
+        </div>
         <div style="margin-bottom:12px;"><label class="form-label">Pilih Bahan <span style="color:var(--danger);">*</span></label><div style="position:relative;"><input type="text" id="reqBahanSearch" class="form-control" placeholder="Ketik nama atau rumus kimia..."  autocomplete="off" oninput="filterReqBahanSearch()" onfocus="showReqBahanDropdown()" onblur="setTimeout(hideReqBahanDropdown, 200)"><div id="reqBahanDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:50;max-height:220px;overflow-y:auto;"></div><input type="hidden" id="reqBahanNama"></div></div>
         <div style="margin-bottom:12px;"><label class="form-label">Jumlah <span style="color:var(--danger);">*</span></label><div style="display:flex;gap:8px;align-items:center;"><input type="number" id="reqBahanQty" class="form-control" placeholder="0" min="0.01" step="any"><span id="reqBahanSatuan" style="white-space:nowrap;color:var(--muted);font-size:13px;font-weight:600;min-width:30px;">—</span></div></div>
         <div id="reqBahanInfo" style="font-size:12.5px;color:var(--muted);padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;">Pilih bahan untuk melihat stok &amp; harga</div>
         <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="submitBahanReq()"><i class="bi bi-check-circle"></i> Ajukan Permintaan Bahan</button>
       </div>
       <div class="card" style="margin-bottom:0;">
-        <div class="card-title"><i class="bi bi-tools" style="color:var(--success);margin-right:8px;"></i>Pinjam Alat Laboratorium</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;"><i class="bi bi-tools" style="color:var(--success);margin-right:8px;"></i>Pinjam Alat Laboratorium</div>
+          <button class="btn btn-outline btn-sm" onclick="openOcrModal('alat')" title="Isi otomatis dari foto kartu bon"><i class="bi bi-camera"></i> Scan Kartu Bon</button>
+        </div>
         <div style="margin-bottom:12px;"><label class="form-label">Pilih Alat <span style="color:var(--danger);">*</span></label><div style="position:relative;"><input type="text" id="reqAlatSearch" class="form-control" placeholder="Ketik nama alat..." autocomplete="off" oninput="filterReqAlatSearch()" onfocus="showReqAlatDropdown()" onblur="setTimeout(hideReqAlatDropdown, 200)"><div id="reqAlatDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:50;max-height:220px;overflow-y:auto;"></div><input type="hidden" id="reqAlatNama"></div></div>
         <div style="margin-bottom:12px;"><label class="form-label">Jumlah <span style="color:var(--danger);">*</span></label><div style="display:flex;gap:8px;align-items:center;"><input type="number" id="reqAlatQty" class="form-control" placeholder="0" min="1"><span id="reqAlatSatuan" style="white-space:nowrap;color:var(--muted);font-size:13px;font-weight:600;min-width:30px;">—</span></div></div>
         <div id="reqAlatInfo" style="font-size:12.5px;color:var(--muted);padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;">Pilih alat untuk melihat stok tersedia</div>
@@ -1340,6 +1360,157 @@
     <!-- ======================================================
      SECTION: DETAIL MAHASISWA (Admin)
      ====================================================== -->
+<!-- ============================================================
+     PATCH HTML — section #sec-loker (Denah Loker)
+     ============================================================ -->
+<div id="sec-loker" class="hidden">
+
+  <!-- HERO -->
+  <div class="hero-card" style="margin-bottom:16px">
+    <div style="font-size:15px;font-weight:800;color:#fff">Denah Loker Laboratorium</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:3px">Klik loker untuk melihat detail pengguna &amp; riwayat. Admin dapat mengubah status langsung dari denah.</div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div id="loker-stats"></div>
+
+  <!-- TOOLBAR -->
+  <div class="loker-toolbar">
+    <div class="loker-search-wrap">
+      <i class="bi bi-search"></i>
+      <input id="loker-search" type="text" placeholder="Cari kode / nama pengguna..." oninput="filterLoker()">
+    </div>
+    <div class="loker-legend">
+      <span class="loker-leg"><span class="loker-leg-sq" style="background:#dcfce7;border:1px solid #86efac"></span>Kosong</span>
+      <span class="loker-leg"><span class="loker-leg-sq" style="background:#dbeafe;border:1px solid #93c5fd"></span>Terpakai</span>
+      <span class="loker-leg"><span class="loker-leg-sq" style="background:#fef3c7;border:1px solid #fcd34d"></span>Dipakai+kunci ada</span>
+      <span class="loker-leg"><span class="loker-leg-sq" style="background:#fee2e2;border:1px solid #fca5a5"></span>Kunci hilang</span>
+      <span class="loker-leg"><span class="loker-leg-sq" style="background:#f1f5f9;border:1px dashed #94a3b8"></span>Buka+kunci hilang</span>
+    </div>
+  </div>
+
+  <!-- DENAH MAP -->
+  <div id="loker-map-wrap"></div>
+
+</div><!-- /sec-loker -->
+
+<!-- ============================================================
+     SECTION: DENAH MEJA KERJA
+     Lihat  → semua role (Admin, PLP, Dosen, Mahasiswa)
+     Isi/ubah identitas → hanya Admin & PLP, hanya dari mahasiswa terdaftar
+     ============================================================ -->
+<div id="sec-denah" class="hidden">
+
+  <!-- HERO -->
+  <div class="hero-card" style="margin-bottom:16px">
+    <div style="font-size:15px;font-weight:800;color:#fff">Denah Meja Kerja Laboratorium</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:3px">Klik stasiun meja untuk melihat identitas penghuni. Admin/PLP dapat mengisi identitas dari daftar mahasiswa terdaftar.</div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div id="denah-stats"></div>
+
+  <!-- TOOLBAR -->
+  <div class="denah-toolbar">
+    <div class="denah-search-wrap">
+      <i class="bi bi-search"></i>
+      <input id="denah-search" type="text" placeholder="Cari kode / nama mahasiswa..." oninput="filterDenah()">
+    </div>
+    <div class="denah-legend">
+      <span class="denah-leg"><span class="denah-leg-sq" style="background:#232f42;border:1.5px dashed #3b82f6"></span>Belum diisi</span>
+      <span class="denah-leg"><span class="denah-leg-sq" style="background:#26364d;border:1.5px solid #f59e0b"></span>Sudah diisi</span>
+    </div>
+  </div>
+
+  <!-- DENAH MAP -->
+  <div id="denah-map-wrap"></div>
+
+</div><!-- /sec-denah -->
+
+<!-- MODAL DENAH MEJA -->
+<div id="denah-modal-bg" onclick="if(event.target===this)closeDenahModal()">
+  <div class="dnm-box">
+    <div class="dnm-head">
+      <div class="dnm-title" id="dnm-title">Detail Stasiun</div>
+      <div class="dnm-x" onclick="closeDenahModal()"><i class="bi bi-x"></i></div>
+    </div>
+    <div class="dnm-row"><span class="dnm-lbl">Kode Stasiun</span><span class="dnm-val" id="dnm-kode"></span></div>
+    <div class="dnm-row"><span class="dnm-lbl">Lokasi</span><span class="dnm-val" id="dnm-meja"></span></div>
+    <div class="dnm-row"><span class="dnm-lbl">Nama Mahasiswa</span><span class="dnm-val" id="dnm-nama"></span></div>
+    <div class="dnm-row"><span class="dnm-lbl">NIM</span><span class="dnm-val" id="dnm-nim"></span></div>
+    <div class="dnm-row"><span class="dnm-lbl">Diperbarui</span><span class="dnm-val" id="dnm-updated"></span></div>
+
+    <!-- EDIT FORM — hanya muncul untuk admin/plp -->
+    <div id="dnm-edit-wrap" class="hidden">
+      <hr class="dnm-edit-sep">
+      <div class="dnm-edit-title"><i class="bi bi-pencil-square" style="margin-right:5px"></i>Isi / Ubah Identitas</div>
+
+      <label class="form-label" style="font-size:11px">Pilih Mahasiswa Terdaftar <span style="color:var(--danger)">*</span></label>
+      <div class="dnm-mhs-search-wrap">
+        <input type="text" id="dnmMhsSearch" class="form-control" style="font-size:12px" placeholder="Ketik NIM atau nama mahasiswa..." autocomplete="off"
+          oninput="filterDenahMhsSearch()" onfocus="showDenahMhsDropdown()" onblur="hideDenahMhsDropdown()">
+        <div id="dnmMhsDropdown" class="dnh-dd"></div>
+        <input type="hidden" id="dnmMhsNim">
+      </div>
+      <div style="font-size:10.5px;color:var(--muted);margin:-4px 0 6px">Identitas hanya bisa dipilih dari mahasiswa yang sudah terdaftar di sistem.</div>
+
+      <button class="dnm-save-btn" onclick="saveDenahEdit()">
+        <i class="bi bi-check-circle" style="margin-right:5px"></i>Simpan Identitas
+      </button>
+      <button class="dnm-unassign-btn hidden" id="dnmUnassignBtn" onclick="unassignDenah()">
+        <i class="bi bi-x-circle" style="margin-right:5px"></i>Kosongkan Stasiun
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LOKER -->
+<div id="loker-modal-bg" onclick="if(event.target===this)closeLokerModal()">
+  <div class="lkm-box">
+    <div class="lkm-head">
+      <div class="lkm-title" id="lkm-title">Detail Loker</div>
+      <div class="lkm-x" onclick="closeLokerModal()"><i class="bi bi-x"></i></div>
+    </div>
+    <div class="lkm-row"><span class="lkm-lbl">Kode</span><span class="lkm-val" id="lkm-kode"></span></div>
+    <div class="lkm-row"><span class="lkm-lbl">Ruangan</span><span class="lkm-val" id="lkm-ruang"></span></div>
+    <div class="lkm-row"><span class="lkm-lbl">Status</span><span id="lkm-status"></span></div>
+    <div class="lkm-row"><span class="lkm-lbl">Pengguna</span><span class="lkm-val" id="lkm-user"></span></div>
+    <div class="lkm-row"><span class="lkm-lbl">NIM / NIP</span><span class="lkm-val" id="lkm-nim"></span></div>
+    <div class="lkm-row"><span class="lkm-lbl">Aktif sejak</span><span class="lkm-val" id="lkm-sejak"></span></div>
+    <div class="lkm-hlbl">Riwayat</div>
+    <div id="lkm-hist"></div>
+
+    <!-- EDIT FORM — hanya muncul untuk admin/plp -->
+    <div id="lkm-edit-wrap" class="hidden">
+      <hr class="lkm-edit-sep">
+      <div class="lkm-edit-title"><i class="bi bi-pencil-square" style="margin-right:5px"></i>Edit Loker</div>
+      <div class="lkm-edit-grid">
+        <div>
+          <label class="form-label" style="font-size:11px">Status</label>
+          <select id="lkm-sel-status" class="form-control" style="font-size:12px">
+            <option value="K">Kosong</option>
+            <option value="T">Terpakai</option>
+            <option value="A">Dipakai + Kunci Ada</option>
+            <option value="H">Terkunci + Kunci Hilang</option>
+            <option value="B">Buka + Kunci Hilang</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px">NIM Pengguna</label>
+          <input id="lkm-inp-nim" type="text" class="form-control" style="font-size:12px" placeholder="cth: 21/123456/PA/01">
+        </div>
+      </div>
+      <div class="lkm-edit-full">
+        <label class="form-label" style="font-size:11px">Catatan</label>
+        <input id="lkm-inp-catatan" type="text" class="form-control" style="font-size:12px" placeholder="Catatan perubahan (opsional)">
+      </div>
+      <button class="lkm-save-btn" onclick="saveLokerEdit()">
+        <i class="bi bi-check-circle" style="margin-right:5px"></i>Simpan Perubahan
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="sec-student-detail" class="hidden">
  
   <!-- ── Toolbar atas ──────────────────────────────────── -->
@@ -1565,6 +1736,59 @@
     </div>
   </div>
 
+  <!-- ── Modal Edit Bon (Admin & PLP) ─────────────────── -->
+  <div id="mdlEditBon" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlEditBon')">
+    <div class="modal-box" style="max-width:420px;">
+      <div class="modal-head">
+        <h5><i class="bi bi-pencil-square" style="color:var(--primary);margin-right:8px;"></i>Edit Data Bon Bahan</h5>
+        <button class="modal-close" onclick="closeModal('mdlEditBon')"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div style="padding:20px;">
+        <!-- Info No. Bon -->
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12.5px;color:var(--muted);">
+          <i class="bi bi-receipt" style="margin-right:5px;"></i>
+          No. Bon: <strong id="editBonIdReq" style="color:#1e293b;font-family:monospace;"></strong>
+          &nbsp;|&nbsp;
+          Tipe: <strong id="editBonTipe" style="color:#1e293b;"></strong>
+        </div>
+
+        <!-- Nama Bahan -->
+        <div style="margin-bottom:14px;">
+          <label class="form-label" style="font-size:12px;font-weight:600;">Nama Bahan Kimia</label>
+          <input type="text" id="editBonNama" class="form-control"
+                 placeholder="Nama bahan kimia"
+                 style="width:100%;margin-top:4px;">
+        </div>
+
+        <!-- Jumlah -->
+        <div style="margin-bottom:20px;">
+          <label class="form-label" style="font-size:12px;font-weight:600;">Jumlah</label>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+            <button type="button"
+                    style="width:36px;height:36px;border:1.5px solid var(--border);border-radius:8px;background:#fee2e2;color:#991b1b;font-size:18px;cursor:pointer;font-weight:700;line-height:1;"
+                    onclick="var v=parseFloat(document.getElementById('editBonJumlah').value)||0;if(v>0.5)document.getElementById('editBonJumlah').value=Math.round((v-1)*100)/100;">−</button>
+            <input type="number" id="editBonJumlah" class="form-control"
+                   min="0.01" step="0.01"
+                   style="flex:1;text-align:center;font-weight:700;font-size:15px;">
+            <button type="button"
+                    style="width:36px;height:36px;border:1.5px solid var(--border);border-radius:8px;background:#dcfce7;color:#166534;font-size:18px;cursor:pointer;font-weight:700;line-height:1;"
+                    onclick="var v=parseFloat(document.getElementById('editBonJumlah').value)||0;document.getElementById('editBonJumlah').value=Math.round((v+1)*100)/100;">+</button>
+            <span id="editBonSatuan" style="font-size:13px;color:var(--muted);min-width:40px;"></span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px;">Klik tombol ± atau ketik langsung untuk mengubah jumlah.</div>
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn btn-outline btn-sm" onclick="closeModal('mdlEditBon')">Batal</button>
+          <button class="btn btn-primary btn-sm" onclick="saveEditBon()">
+            <i class="bi bi-check-lg"></i> Simpan Perubahan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="mdlPayDetail" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlPayDetail')">
     <div class="modal-box modal-w-lg"><div class="modal-head"><h5><i class="bi bi-receipt" style="color:var(--warning);margin-right:8px;"></i>Detail Tagihan Bahan Kimia</h5><button class="modal-close" onclick="closeModal('mdlPayDetail')"><i class="bi bi-x-lg"></i></button></div><div id="mdlPayDetailBody"></div></div>
   </div>
@@ -1721,6 +1945,80 @@
     </div>
   </div>
 
+  <!-- ======================================================
+       MODAL: OCR — SCAN KARTU BON (bahan / alat)
+       ====================================================== -->
+  <div id="mdlOcr" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('mdlOcr')">
+    <div class="modal-box modal-w-xl">
+      <div class="modal-head">
+        <h5 id="ocrModalTitle"><i class="bi bi-camera" style="color:var(--primary);margin-right:8px;"></i>Scan Kartu Bon</h5>
+        <button class="modal-close" onclick="closeModal('mdlOcr')"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="ocr-steps">
+        <div class="ocr-step-dot ocr-step-active" id="ocrStep1"><span class="ocr-step-num">1</span> Unggah Foto</div>
+        <div class="ocr-step-line"></div>
+        <div class="ocr-step-dot ocr-step-idle" id="ocrStep2"><span class="ocr-step-num">2</span> Baca &amp; Periksa</div>
+        <div class="ocr-step-line"></div>
+        <div class="ocr-step-dot ocr-step-idle" id="ocrStep3"><span class="ocr-step-num">3</span> Submit</div>
+      </div>
+
+      <!-- Upload zone -->
+      <div id="ocrUploadZone">
+        <div id="ocrDropTarget" class="ocr-drop-zone"
+             ondragover="ocrDragOver(event)" ondragleave="ocrDragLeave()" ondrop="ocrDrop(event)"
+             onclick="document.getElementById('ocrFileInput').click()">
+          <i class="bi bi-cloud-arrow-up" style="font-size:32px;color:var(--primary);"></i>
+          <div style="font-weight:700;margin-top:8px;">Klik atau seret foto kartu bon ke sini</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:4px;">Format JPG, PNG, atau WEBP</div>
+        </div>
+        <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" onchange="ocrHandleFile(this.files[0])">
+      </div>
+
+      <!-- Preview foto -->
+      <div id="ocrPreviewWrap" class="hidden">
+        <img id="ocrPreviewImg" class="ocr-preview-img" src="" alt="Preview kartu bon">
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn btn-outline btn-sm" onclick="ocrReset()"><i class="bi bi-arrow-repeat"></i> Ganti Foto</button>
+          <button class="btn btn-primary" id="ocrBtnProcess" style="flex:1;justify-content:center;" onclick="ocrProcess()"><i class="bi bi-cpu"></i> Baca Kartu Bon</button>
+        </div>
+      </div>
+
+      <!-- Placeholder kosong -->
+      <div id="ocrEmptyPlaceholder" class="empty-state hidden" style="padding:20px 0;">
+        <div class="empty-state-icon">🧾</div>
+        <div class="empty-state-title">Belum ada foto diunggah</div>
+        <div class="empty-state-sub">Unggah foto kartu bon lalu klik "Baca Kartu Bon" untuk mulai membaca otomatis.</div>
+      </div>
+
+      <!-- Hasil bacaan (tabel editable) -->
+      <div id="ocrResultWrap" class="hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:16px 0 8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="ocrItemCount" style="font-weight:700;font-size:13px;"></span>
+            <span id="ocrWarnBadge" class="hidden" style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;"></span>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="ocrAddRow()"><i class="bi bi-plus-lg"></i> Tambah Baris</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th style="min-width:150px;position:sticky;left:0;z-index:2;background:#f8fafc;">Nama</th><th>Spesifikasi</th><th>Jumlah</th><th>Satuan</th><th>Tanggal</th><th>Yakin</th><th></th></tr></thead>
+            <tbody id="ocrTableBody"></tbody>
+          </table>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:8px;">
+          <i class="bi bi-info-circle"></i> Periksa dan koreksi hasil bacaan sebelum submit. Baris dengan tingkat keyakinan rendah ditandai kuning — cek ulang tulisan tangan aslinya.
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div id="ocrSubmitWrap" class="hidden" style="margin-top:16px;">
+        <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="ocrSubmit()"><i class="bi bi-send-check"></i> Submit Semua Item</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /appWrap -->
 
 <!-- ============================================================
@@ -1738,7 +2036,10 @@
 <script src="js/export.js"></script>
 <script src="js/misc.js"></script>
 <script src="js/survei.js"></script><!-- >>> SURVEI: script dipindah ke urutan load utama -->
+<script src="js/loker.js"></script><!-- >>> LOKER: denah & manajemen loker -->
+<script src="js/denah.js"></script><!-- >>> DENAH: denah meja kerja lab & identitas mahasiswa -->
 <script src="js/dosen.js"></script><!-- >>> DOSEN: dashboard & log bimbingan role Dosen -->
+<script src="js/ocr.js"></script><!-- >>> OCR: scan kartu bon via Gemini/Claude Vision API -->
 <script>
 // Tutup dropdown cetak saat klik di luar area dropdown
 document.addEventListener('click', function(e) {
