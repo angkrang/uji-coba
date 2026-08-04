@@ -1501,10 +1501,16 @@
           </select>
         </div>
         <div>
-          <label class="form-label" style="font-size:11px">NIM Pengguna</label>
-          <input id="lkm-inp-nim" type="text" class="form-control" style="font-size:12px" placeholder="cth: 21/123456/PA/01">
+          <label class="form-label" style="font-size:11px">Mahasiswa Terdaftar (Aktif)</label>
+          <div class="dnm-mhs-search-wrap">
+            <input type="text" id="lkmMhsSearch" class="form-control" style="font-size:12px" placeholder="Ketik NIM atau nama mahasiswa..." autocomplete="off"
+              oninput="filterLokerMhsSearch()" onfocus="showLokerMhsDropdown()" onblur="hideLokerMhsDropdown()">
+            <div id="lkmMhsDropdown" class="dnh-dd"></div>
+            <input type="hidden" id="lkmMhsNim">
+          </div>
         </div>
       </div>
+      <div style="font-size:10.5px;color:var(--muted);margin:-4px 0 6px">Hanya bisa dipilih dari mahasiswa terdaftar berstatus Aktif. Kosongkan kalau status diubah jadi "Kosong".</div>
       <div class="lkm-edit-full">
         <label class="form-label" style="font-size:11px">Catatan</label>
         <input id="lkm-inp-catatan" type="text" class="form-control" style="font-size:12px" placeholder="Catatan perubahan (opsional)">
