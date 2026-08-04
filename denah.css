@@ -1,0 +1,233 @@
+/* ============================================================
+   DENAH.CSS — Styles untuk halaman Denah Meja Kerja
+   ============================================================ */
+
+/* STAT CARDS ROW (reuse pola loker) */
+#denah-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+#denah-stats .stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-card);
+  transition: transform .2s;
+}
+#denah-stats .stat-card:hover { transform: translateY(-2px); }
+
+/* TOOLBAR */
+.denah-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.denah-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 12px;
+  flex: 1;
+  max-width: 280px;
+}
+.denah-search-wrap input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  width: 100%;
+}
+.denah-search-wrap i { color: var(--muted); font-size: 14px; }
+
+.denah-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.denah-leg { display: flex; align-items: center; gap: 5px; }
+.denah-leg-sq { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+/* GRID DENAH — 2 kolom di desktop, 1 kolom di mobile */
+#denah-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 780px) {
+  #denah-grid { grid-template-columns: 1fr; }
+}
+
+/* KARTU MEJA */
+.dnh-table-card {
+  background: #1a2332;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: var(--shadow-card);
+}
+.dnh-table-label {
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+/* KURSI dekoratif */
+.dnh-seat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 4px 0;
+}
+.dnh-seat {
+  height: 8px;
+  border-radius: 6px;
+  background: #d9822b;
+  opacity: .85;
+  margin: 0 auto;
+  width: 60%;
+}
+
+/* BARIS STASIUN */
+.dnh-station-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 6px 0;
+}
+.dnh-station {
+  border: 1.5px dashed #3b82f6;
+  border-radius: 10px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  min-height: 62px;
+  transition: transform .12s, box-shadow .12s, background .12s;
+  text-align: center;
+}
+.dnh-station:hover { transform: scale(1.03); box-shadow: 0 4px 14px rgba(0,0,0,.25); z-index: 2; }
+.dnh-station.dnh-empty { background: #232f42; border-color: #3b82f6; }
+.dnh-station.dnh-filled { background: #26364d; border-color: #f59e0b; border-style: solid; }
+.dnh-st-icon { color: #93c5fd; font-size: 13px; }
+.dnh-filled .dnh-st-icon { color: #fbbf24; }
+.dnh-st-kode { color: #cbd5e1; font-size: 9px; font-weight: 700; letter-spacing: .3px; }
+.dnh-st-name {
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 1.15;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dnh-empty .dnh-st-name { color: #64748b; font-weight: 500; }
+
+/* PERMUKAAN MEJA dekoratif (outlet & keran gas) */
+.dnh-table-surface {
+  background: #b8c2cf;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin: 6px 0;
+}
+.dnh-fixture { color: #475569; font-size: 12px; opacity: .8; }
+.dnh-fx-gas { color: #b45309; }
+
+/* ============================================================
+   MODAL STASIUN
+   ============================================================ */
+#denah-modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.55);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+#denah-modal-bg.open { display: flex; }
+.dnm-box {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 18px;
+  width: 100%;
+  max-width: 380px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+.dnm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.dnm-title { font-size: 15px; font-weight: 800; color: var(--text); }
+.dnm-x { cursor: pointer; font-size: 20px; color: var(--muted); line-height: 1; padding: 2px 6px; }
+.dnm-x:hover { color: var(--text); }
+.dnm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 12.5px;
+}
+.dnm-lbl { color: var(--muted); font-weight: 500; }
+.dnm-val { color: var(--text); font-weight: 700; text-align: right; }
+
+.dnm-edit-sep { border: none; border-top: 1px solid var(--border); margin: 14px 0 10px; }
+.dnm-edit-title { font-size: 12.5px; font-weight: 700; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; }
+.dnm-mhs-search-wrap { position: relative; margin-bottom: 10px; }
+.dnh-dd {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  z-index: 50;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.dnh-dd-item { padding: 8px 12px; cursor: pointer; }
+.dnh-dd-item:hover { background: #f0f9ff; }
+.dnm-save-btn, .dnm-unassign-btn {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.dnm-save-btn { background: var(--primary); color: #fff; }
+.dnm-save-btn:hover { opacity: .9; }
+.dnm-unassign-btn { background: #fee2e2; color: #991b1b; margin-top: 8px; }
+.dnm-unassign-btn:hover { background: #fecaca; }
