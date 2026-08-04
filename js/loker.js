@@ -24,6 +24,10 @@ var LKR_BADGE = { K:'b-green', T:'b-blue', A:'b-amber', H:'b-red', B:'b-gray' };
 
 /* data loker aktif di memori */
 var _lokerData = [];
+/* daftar mahasiswa terdaftar (sumber identitas — TIDAK BOLEH input bebas,
+   sama seperti fitur Denah Meja Kerja) */
+var _lokerMhsList = [];
+var _lokerPickedNim = '';
 
 /* ----------------------------------------------------------
    LOAD DATA dari GAS
@@ -46,6 +50,17 @@ async function loadLoker() {
     _lokerData = _lokerDemoData();
     _renderLokerStats();
     _renderLokerMap();
+  }
+
+  /* muat daftar mahasiswa terdaftar untuk dropdown identitas —
+     hanya perlu utk admin/plp, dimuat sekali di awal */
+  if (_role === 'admin' || _role === 'plp') {
+    try {
+      var mhs = await callGAS('getMahasiswaExternal');
+      _lokerMhsList = Array.isArray(mhs) ? mhs : [];
+    } catch(e) {
+      _lokerMhsList = [];
+    }
   }
 }
 
@@ -292,8 +307,15 @@ function _openLokerModal(d, ruang) {
     if (isAdmin) {
       editWrap.classList.remove('hidden');
       document.getElementById('lkm-sel-status').value = d.status;
-      document.getElementById('lkm-inp-nim').value    = d.nim || '';
+      var searchEl = document.getElementById('lkmMhsSearch');
+      var hiddenEl = document.getElementById('lkmMhsNim');
+      var namaTerpasang = (d.namaPengguna && d.namaPengguna !== '—') ? d.namaPengguna : '';
+      var nimTerpasang  = (d.nim && d.nim !== '—') ? d.nim : '';
+      if (searchEl) searchEl.value = nimTerpasang ? (nimTerpasang + ' — ' + namaTerpasang) : '';
+      if (hiddenEl) hiddenEl.value = nimTerpasang;
+      _lokerPickedNim = nimTerpasang;
       document.getElementById('lkm-inp-catatan').value = '';
+      _hideLokerDropdown();
     } else {
       editWrap.classList.add('hidden');
     }
@@ -307,11 +329,61 @@ function closeLokerModal() {
   _activeLoker = null;
 }
 
+/* ----------------------------------------------------------
+   DROPDOWN PENCARIAN MAHASISWA — HANYA dari data terdaftar &
+   berstatus Aktif, tidak ada opsi input bebas.
+   ---------------------------------------------------------- */
+function filterLokerMhsSearch() {
+  var q = (document.getElementById('lkmMhsSearch').value || '').toLowerCase().trim();
+  document.getElementById('lkmMhsNim').value = ''; // reset pilihan sampai user klik item valid
+  var dd = document.getElementById('lkmMhsDropdown');
+  if (!dd) return;
+
+  var list = _lokerMhsList.filter(function (m) {
+    if (!q) return true;
+    var hay = ((m.nim || '') + ' ' + (m.nama || '')).toLowerCase();
+    return hay.indexOf(q) !== -1;
+  }).slice(0, 30);
+
+  if (!list.length) {
+    dd.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--muted)">Tidak ada mahasiswa terdaftar yang cocok.</div>';
+  } else {
+    dd.innerHTML = list.map(function (m) {
+      var status = (m.status || '').toLowerCase().trim();
+      var aktif = status === 'aktif';
+      /* Hanya mahasiswa Aktif yang boleh dipilih — validasi sesungguhnya
+         tetap di server (assignLoker / updateLokerStatus) */
+      var clickAttr = aktif ? ' onmousedown="_pickLokerMhs(\'' + esc(m.nim) + '\',\'' + esc((m.nama || '').replace(/'/g, "\\'")) + '\')"' : '';
+      return '<div class="dnh-dd-item' + (aktif ? '' : ' dnh-dd-disabled') + '"' + clickAttr + '>'
+        + '<div style="font-weight:700;font-size:12.5px;color:var(--text)">' + esc(m.nama || '—') + '</div>'
+        + '<div style="font-size:11px;color:var(--muted)">' + esc(m.nim || '—') + (aktif ? '' : ' · <span style="color:var(--danger)">' + esc(m.status || 'Tidak aktif') + ' — tidak berhak pakai loker</span>') + '</div>'
+        + '</div>';
+    }).join('');
+  }
+  dd.style.display = 'block';
+}
+function showLokerMhsDropdown() { filterLokerMhsSearch(); }
+function _hideLokerDropdown() { var dd = document.getElementById('lkmMhsDropdown'); if (dd) dd.style.display = 'none'; }
+function hideLokerMhsDropdown() { setTimeout(_hideLokerDropdown, 200); }
+
+function _pickLokerMhs(nim, nama) {
+  document.getElementById('lkmMhsSearch').value = nim + ' — ' + nama;
+  document.getElementById('lkmMhsNim').value = nim;
+  _lokerPickedNim = nim;
+  _hideLokerDropdown();
+}
+
 async function saveLokerEdit() {
   if (!_activeLoker) return;
   var status  = document.getElementById('lkm-sel-status').value;
-  var nim     = document.getElementById('lkm-inp-nim').value.trim();
+  var nim     = (document.getElementById('lkmMhsNim').value || '').trim();
   var catatan = document.getElementById('lkm-inp-catatan').value.trim();
+
+  /* kalau status bukan Kosong, wajib pilih mahasiswa terdaftar dari dropdown */
+  if (status !== 'K' && !nim) {
+    Swal.fire('Peringatan', 'Pilih mahasiswa dari daftar yang sudah terdaftar & berstatus Aktif terlebih dahulu. NIM tidak bisa diketik bebas.', 'warning');
+    return;
+  }
 
   Swal.fire({ title:'Menyimpan...', allowOutsideClick:false, didOpen:function(){ Swal.showLoading(); } });
   try {
