@@ -172,11 +172,13 @@ function _dnhSeatRow() {
 function _dnhStationEl(meja, posisi, iconIdx) {
   var d = _denahByPos(meja, posisi);
   var filled = !!d.nim;
+  var perluDikosongkan = filled && !!d.sudahLulus;
   var el = document.createElement('div');
-  el.className = 'dnh-station' + (filled ? ' dnh-filled' : ' dnh-empty');
+  el.className = 'dnh-station' + (filled ? ' dnh-filled' : ' dnh-empty') + (perluDikosongkan ? ' dnh-lulus' : '');
   el.innerHTML = '<span class="dnh-st-icon"><i class="bi ' + DNH_STATION_ICONS[iconIdx] + '"></i></span>'
     + '<span class="dnh-st-kode">' + esc(d.kode) + '</span>'
-    + '<span class="dnh-st-name">' + (filled ? esc(d.nama) : 'Kosong') + '</span>';
+    + '<span class="dnh-st-name">' + (filled ? esc(d.nama) : 'Kosong') + '</span>'
+    + (perluDikosongkan ? '<span class="dnh-st-badge" title="Mahasiswa sudah lulus, meja perlu dikosongkan"><i class="bi bi-exclamation-triangle-fill"></i> Lulus</span>' : '');
   el.onclick = function () { _openDenahModal(meja, posisi); };
   return el;
 }
@@ -199,6 +201,9 @@ function _openDenahModal(meja, posisi) {
   document.getElementById('dnm-nama').textContent = d.nama || '— Belum diisi —';
   document.getElementById('dnm-nim').textContent = d.nim || '—';
   document.getElementById('dnm-updated').textContent = d.updatedAt ? (d.updatedAt + (d.updatedBy ? ' oleh ' + d.updatedBy : '')) : '—';
+
+  var lulusWarn = document.getElementById('dnm-lulus-warning');
+  if (lulusWarn) lulusWarn.classList.toggle('hidden', !d.sudahLulus);
 
   var editWrap = document.getElementById('dnm-edit-wrap');
   if (editWrap) {
@@ -244,10 +249,16 @@ function filterDenahMhsSearch() {
     dd.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--muted)">Tidak ada mahasiswa terdaftar yang cocok.</div>';
   } else {
     dd.innerHTML = list.map(function (m) {
-      var aktif = (m.status || '').toLowerCase().trim() === 'aktif';
-      return '<div class="dnh-dd-item" onmousedown="_pickDenahMhs(\'' + esc(m.nim) + '\',\'' + esc((m.nama || '').replace(/'/g, "\\'")) + '\')">'
+      var status = (m.status || '').toLowerCase().trim();
+      var aktif = status === 'aktif';
+      var lulus = status === 'lulus';
+      /* Mahasiswa Lulus ditampilkan tapi tidak bisa diklik/dipilih —
+         hak pakai meja kerja sudah dicabut sejak status Lulus.
+         Validasi sesungguhnya tetap di server (assignMejaIdentitas). */
+      var clickAttr = lulus ? '' : ' onmousedown="_pickDenahMhs(\'' + esc(m.nim) + '\',\'' + esc((m.nama || '').replace(/'/g, "\\'")) + '\')"';
+      return '<div class="dnh-dd-item' + (lulus ? ' dnh-dd-disabled' : '') + '"' + clickAttr + '>'
         + '<div style="font-weight:700;font-size:12.5px;color:var(--text)">' + esc(m.nama || '—') + '</div>'
-        + '<div style="font-size:11px;color:var(--muted)">' + esc(m.nim || '—') + (aktif ? '' : ' · <span style="color:var(--danger)">' + esc(m.status || 'Tidak aktif') + '</span>') + '</div>'
+        + '<div style="font-size:11px;color:var(--muted)">' + esc(m.nim || '—') + (aktif ? '' : ' · <span style="color:var(--danger)">' + esc(m.status || 'Tidak aktif') + (lulus ? ' — tidak berhak pakai meja' : '') + '</span>') + '</div>'
         + '</div>';
     }).join('');
   }
