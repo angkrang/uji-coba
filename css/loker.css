@@ -1,0 +1,213 @@
+/* ============================================================
+   LOKER.CSS — Styles untuk halaman Denah Loker
+   ============================================================ */
+
+/* STATUS CELL */
+.lkr-cell { position:absolute; }
+
+.lkr-s-K { background:#dcfce7; border-color:#86efac !important; }
+.lkr-s-K span:nth-child(2) { color:#166534; }
+
+.lkr-s-T { background:#dbeafe; border-color:#93c5fd !important; }
+.lkr-s-T span:nth-child(2) { color:#1e40af; }
+
+.lkr-s-A { background:#fef3c7; border-color:#fcd34d !important; }
+.lkr-s-A span:nth-child(2) { color:#92400e; }
+
+.lkr-s-H { background:#fee2e2; border-color:#fca5a5 !important; }
+.lkr-s-H span:nth-child(2) { color:#991b1b; }
+
+.lkr-s-B { background:#f1f5f9; border-color:#94a3b8 !important; border-style:dashed !important; }
+.lkr-s-B span:nth-child(2) { color:#475569; }
+
+/* STAT CARDS ROW */
+#loker-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+#loker-stats .stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-card);
+  transition: transform .2s;
+}
+#loker-stats .stat-card:hover { transform: translateY(-2px); }
+
+/* SEARCH BAR */
+.loker-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.loker-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 12px;
+  flex: 1;
+  max-width: 280px;
+}
+.loker-search-wrap input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  width: 100%;
+}
+.loker-search-wrap i { color: var(--muted); font-size: 14px; }
+
+/* LEGEND */
+.loker-legend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.loker-leg {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.loker-leg-sq {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* MODAL LOKER */
+#loker-modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,15,30,.5);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+#loker-modal-bg.open { display: flex; }
+
+.lkm-box {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 22px;
+  width: 300px;
+  max-width: 94vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,.22);
+  animation: lkmSlide .18s ease;
+}
+@keyframes lkmSlide {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.lkm-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.lkm-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.lkm-x {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 13px; color: var(--muted);
+  transition: background .15s;
+}
+.lkm-x:hover { background: var(--border); }
+
+.lkm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--bg);
+  font-size: 12px;
+}
+.lkm-row:last-of-type { border: none; }
+.lkm-lbl { color: var(--muted); }
+.lkm-val { font-weight: 600; color: var(--text); text-align: right; }
+
+.lkm-hlbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin: 12px 0 6px;
+}
+.lkm-hitem {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  padding: 3px 0;
+  border-bottom: 1px solid var(--bg);
+}
+.lkm-hitem:last-child { border: none; }
+.lkm-hdot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+/* EDIT FORM dalam modal */
+.lkm-edit-sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 14px 0 10px;
+}
+.lkm-edit-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 10px;
+}
+.lkm-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.lkm-edit-full { margin-bottom: 8px; }
+
+.lkm-save-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px;
+  border-radius: 10px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.lkm-save-btn:hover { background: var(--primary-dark, #1d4ed8); }
